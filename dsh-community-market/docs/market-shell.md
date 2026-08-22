@@ -64,7 +64,7 @@ The standard adapter serializes only fields declared in the source manifest's `q
 
 [DSH 1024Store](https://github.com/imsai-sh/awesome-deepseek-harness-plugins) is one of the providers currently cooperating with the project, and the market includes a reviewed built-in adapter for its public API. It is not a default, preferred source, or fallback, and the cooperation does not mean that its listings were reviewed or endorsed. Its endpoint and schema remain owned by that independent project.
 
-[dshfind](https://dshfind.com) is another optional cooperating source with a reviewed built-in adapter. It is not selected by default, preferred, recommended, or used as a fallback. Its listings, scores, grades, `official`/featured labels, risk labels, and installation probes remain provider claims rather than Anywhere Labs trust decisions.
+[dshfind](https://dshfind.com) is another optional cooperating source with a reviewed built-in adapter. It is not selected by default, preferred, recommended, or used as a fallback. Its listings, scores, grades, `official`/featured labels, risk labels, and installation probes remain provider claims rather than the maintainers of this repository trust decisions.
 
 The published normative contract is the [catalog provider contract](catalog-provider-contract.md), with machine-readable schemas for the source manifest, query, untrusted provider page, and Host-normalized response. Remote fields are display data, not executable instructions. Text is rendered as text, never as raw HTML.
 
@@ -206,4 +206,4 @@ Raw response bodies, filesystem paths, tokens, environment variables, and comman
 
 The design is informed by community catalog projects including [imsai-sh/awesome-deepseek-harness-plugins](https://github.com/imsai-sh/awesome-deepseek-harness-plugins), also presented as DSH 1024Store. DSH 1024Store is a current cooperating provider, and it also publishes the separate `dsh-1024store` plugin. DSH Community Market is not a fork, repackaging, or official client of that plugin. Its application code is MIT licensed and its catalog metadata is CC0-1.0. The Market copies neither its code nor its artwork and bundles no catalog snapshot.
 
-DSH Community Market is an independent Anywhere Labs project. Catalog inclusion does not imply endorsement by Anywhere Labs, DSH 1024Store, DeepSeek, or a plugin author.
+DSH Community Market is an independent the maintainers of this repository project. Catalog inclusion does not imply endorsement by the maintainers of this repository, DSH 1024Store, DeepSeek, or a plugin author.

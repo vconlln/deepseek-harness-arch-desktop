@@ -64,7 +64,7 @@ DSH Community Market 以开放方式与各种插件数据源合作。任何人�
 
 [DSH 1024Store](https://github.com/imsai-sh/awesome-deepseek-harness-plugins) 是目前与项目合作的提供方之一，市场已包含针对其公开 API、经过审查的内置适配器。它不是默认、优先或兜底来源，合作关系也不表示其收录内容经过我们审核或推荐。它的接口和 schema 继续归该独立项目所有。
 
-[dshfind](https://dshfind.com) 是另一个通过经审查内置 adapter 接入的可选合作来源。它不会被默认选择、优先排序、推荐或用作兜底。它的目录收录、分数、等级、`official`/精选标记、风险标记和安装探测仍是 provider claim，不是 Anywhere Labs 作出的信任判断。
+[dshfind](https://dshfind.com) 是另一个通过经审查内置 adapter 接入的可选合作来源。它不会被默认选择、优先排序、推荐或用作兜底。它的目录收录、分数、等级、`official`/精选标记、风险标记和安装探测仍是 provider claim，不是 本仓库维护者 作出的信任判断。
 
 已发布的规范合同是[目录提供方合同](catalog-provider-contract.zh.md)，其中包含来源 manifest、query、不可信 provider page 和 Host 标准化响应的机器可读 Schema。远程字段只是展示数据，不是可执行指令；文本只能按文本渲染，不能作为原始 HTML。
 
@@ -206,4 +206,4 @@ Add 成功后，系统会在开放重启许可前封存白名单文件的结果 
 
 本设计参考了多个社区目录项目，其中包括 [imsai-sh/awesome-deepseek-harness-plugins](https://github.com/imsai-sh/awesome-deepseek-harness-plugins)，该项目也以 DSH 1024Store 展示。DSH 1024Store 是当前合作的提供方，并另行发布 `dsh-1024store` 插件。DSH Community Market 不是该插件的 fork、重新打包版本或官方客户端。其应用代码使用 MIT，目录元数据使用 CC0-1.0。Market 没有复制其代码或素材，也没有打包目录快照。
 
-DSH Community Market 是 Anywhere Labs 的独立项目。目录收录不表示 Anywhere Labs、DSH 1024Store、DeepSeek 或插件作者对项目作出推荐。
+DSH Community Market 是 本仓库维护者 的独立项目。目录收录不表示 本仓库维护者、DSH 1024Store、DeepSeek 或插件作者对项目作出推荐。

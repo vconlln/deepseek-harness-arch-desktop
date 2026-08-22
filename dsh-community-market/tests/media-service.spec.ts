@@ -14,7 +14,7 @@ import {
 const candidate = (overrides: Partial<MarketMediaCandidate> = {}): MarketMediaCandidate => ({
   remoteUrl: 'https://github.com/vconlln.png?size=128',
   role: 'publisher-avatar',
-  alt: 'Anywhere Labs',
+  alt: 'vconlln',
   sourceRecordId: '018f1f77-a5c4-7b73-a9ae-0242ac120002',
   itemId: 'vconlln/deepseek-harness-arch-desktop',
   allowedHostnames: ['github.com', 'avatars.githubusercontent.com'],
