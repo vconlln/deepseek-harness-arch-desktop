@@ -23,8 +23,8 @@ optdepends=(
   'bubblewrap: 文件系统沙箱后端,未安装时自动回退 Landlock'
   'fuse2: 运行 AppImage 版本时需要'
 )
-provides=("deepseek-harness-desktop=${pkgver}")
-conflicts=(deepseek-harness-desktop)
+provides=("dsh-plugin-desktop=${pkgver}")
+conflicts=(dsh-plugin-desktop)
 source=("DSH-Desktop-${pkgver}-x64.pacman::https://github.com/${_owner}/deepseek-harness-desktop-arch/releases/download/v${pkgver}/DSH-Desktop-${pkgver}-x64.pacman")
 sha256sums=('SKIP')
 

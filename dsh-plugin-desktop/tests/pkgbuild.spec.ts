@@ -45,9 +45,10 @@ describe('Arch Linux AUR package', () => {
     expect(pkgbuild).toContain('sha256sum 产物')
   })
 
-  it('declares provides and conflicts against the source package', () => {
-    expect(pkgbuild).toContain('provides=("deepseek-harness-desktop=')
-    expect(pkgbuild).toContain('conflicts=(deepseek-harness-desktop)')
+  it('declares provides and conflicts against the packaged binary name', () => {
+    // The electron-builder pacman archive is named after the npm package.
+    expect(pkgbuild).toContain('provides=("dsh-plugin-desktop=')
+    expect(pkgbuild).toContain('conflicts=(dsh-plugin-desktop)')
   })
 
   it('mirrors the electron-builder desktop entry fields', () => {
