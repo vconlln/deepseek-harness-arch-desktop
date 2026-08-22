@@ -133,8 +133,10 @@ export function verifyLinuxPackage(
     const hasEntry = (candidate: string, directory = false): boolean =>
       entries!.some(entry => entry === candidate || (directory && entry.startsWith(`${candidate}/`)))
     expect(hasEntry('usr/bin/dsh-desktop'), 'pacman archive is missing usr/bin/dsh-desktop')
-    expect(hasEntry('resources/app.asar'), 'pacman archive is missing the resources/app.asar entry')
-    expect(hasEntry('resources/app.asar.unpacked', true), 'pacman archive is missing the resources/app.asar.unpacked tree')
+    expect(entries.some(entry => entry === 'resources/app.asar' || entry.endsWith('/resources/app.asar')), 'pacman archive is missing the resources/app.asar entry')
+    expect(entries.some(entry => entry === 'resources/app.asar.unpacked'
+      || entry.endsWith('/resources/app.asar.unpacked')
+      || entry.includes('/resources/app.asar.unpacked/')), 'pacman archive is missing the resources/app.asar.unpacked tree')
     expect(hasEntry('usr/share/applications/dsh-desktop.desktop'), 'pacman archive is missing usr/share/applications/dsh-desktop.desktop')
     expect(entries.some(entry => /^usr\/share\/icons\/hicolor\/[^/]+\/apps\/dsh-desktop\.png$/u.test(entry)), 'pacman archive is missing a hicolor dsh-desktop.png icon')
     const desktopEntryName = 'usr/share/applications/dsh-desktop.desktop'

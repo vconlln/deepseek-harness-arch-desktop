@@ -46,7 +46,14 @@ const manifest = JSON.parse(readFileSync(new URL('package.json', packageRoot), '
     win?: { icon?: unknown; target?: unknown; artifactName?: unknown }
     nsis?: Record<string, unknown>
     portable?: Record<string, unknown>
-    linux?: { icon?: unknown }
+    linux?: {
+      icon?: unknown
+      target?: unknown
+      executableName?: unknown
+      artifactName?: unknown
+      maintainer?: unknown
+      desktop?: { entry?: Record<string, unknown> }
+    }
   }
   dependencies?: Record<string, unknown>
   optionalDependencies?: Record<string, unknown>

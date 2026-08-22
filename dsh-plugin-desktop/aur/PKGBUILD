@@ -18,7 +18,7 @@ pkgdesc='DSH Desktop: DeepSeek Harness 的 Electron 桌面端(Arch Linux 适配)
 arch=(x86_64)
 url='https://github.com/deepseek-ai/deepseek-harness'
 license=(MIT)
-depends=(gtk3 nss alsa-lib libxss)
+depends=('gtk3' 'nss' 'alsa-lib' 'libxss')
 optdepends=(
   'bubblewrap: 文件系统沙箱后端,未安装时自动回退 Landlock'
   'fuse2: 运行 AppImage 版本时需要'

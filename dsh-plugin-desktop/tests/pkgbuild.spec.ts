@@ -1,14 +1,13 @@
 import { readFileSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { parseDesktopEntry } from '../scripts/verify-linux-package.ts'
 
-const manifest = JSON.parse(readFileSync(new URL('package.json', import.meta.url), 'utf8')) as {
+const manifest = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as {
   version?: unknown
   build?: { linux?: { desktop?: { entry?: Record<string, string> } } }
 }
-const pkgbuild = readFileSync(new URL('aur/PKGBUILD', import.meta.url), 'utf8')
-const desktop = readFileSync(new URL('aur/dsh-desktop.desktop', import.meta.url), 'utf8')
+const pkgbuild = readFileSync(new URL('../aur/PKGBUILD', import.meta.url), 'utf8')
+const desktop = readFileSync(new URL('../aur/dsh-desktop.desktop', import.meta.url), 'utf8')
 
 function variable(content: string, name: string): string {
   const match = new RegExp(`^${name}=(.+)$`, 'mu').exec(content)
@@ -31,7 +30,7 @@ describe('Arch Linux AUR package', () => {
     for (const name of ['gtk3', 'nss', 'alsa-lib', 'libxss']) {
       expect(depends).toContain(`'${name}'`)
     }
-    const optdepends = /^optdepends=\((?:[\s\S]*?)\)$/mu.exec(pkgbuild)?.[1] ?? ''
+    const optdepends = /^optdepends=\(([\s\S]*?)\)$/mu.exec(pkgbuild)?.[1] ?? ''
     expect(optdepends).toContain('bubblewrap')
     expect(optdepends).toContain('fuse2')
   })

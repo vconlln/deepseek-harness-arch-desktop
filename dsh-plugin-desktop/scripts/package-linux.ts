@@ -2,7 +2,7 @@
 
 import { spawnSync } from 'node:child_process'
 import { createRequire } from 'node:module'
-import { dirname, join, resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const SIGNING_KEYS = [
@@ -110,7 +110,7 @@ function assertLinuxPackageHost(options: LinuxPackageOptions): void {
   if (options.arch !== 'x64') {
     throw new Error(`Linux artifacts require x64 Node; received ${options.arch}`)
   }
-  const versionMatch = /^(d+)\.(d+)\./u.exec(options.nodeVersion)
+  const versionMatch = /^(\d+)\.(\d+)\./u.exec(options.nodeVersion)
   const major = Number(versionMatch?.[1])
   const minor = Number(versionMatch?.[2])
   if (!((major === 22 && minor >= 19) || major >= 24)) {
