@@ -82,8 +82,3 @@ dsh-community-fabric/  社区互操作规范
 deepseek-harness/      官方上游固定版本(git 子模块)
 docs/superpowers/specs/ Arch 适配设计文档
 ```
-
-## License
-
-MIT。原始代码版权归 Anywhere Labs,Arch 适配部分版权归 vconlln。
-
