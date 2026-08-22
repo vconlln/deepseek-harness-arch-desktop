@@ -2,7 +2,7 @@
 
 [中文说明](README.zh.md)
 
-DSH Community Market is the open plugin market built into [DSH Desktop](../README.en.md). It helps people discover community plugins and, on Desktop, install, manage, or remove npm packages that pass the Market Host's checks.
+DSH Community Market is the open plugin market built into [DSH Desktop](../README.md). It helps people discover community plugins and, on Desktop, install, manage, or remove npm packages that pass the Market Host's checks.
 
 > **Current status: complete and built into DSH Desktop.** The package provides loadable Host and Client entries, persisted user-owned source records, a constrained HTTPS client, standard sources and reviewed cooperating-source adapters, an official **Plugin market** tab under **Settings > Plugins**, a sidebar launcher, Host-managed install and receipt-backed uninstall, plus fail-closed enable/disable controls for mutable direct bundles. This is not a claim that listed or installable plugin code is safe.
 
