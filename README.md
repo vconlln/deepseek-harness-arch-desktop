@@ -2,7 +2,7 @@
 
 DSH Desktop 的 **Arch Linux 发行版**。它是 DeepSeek Harness 的 Electron 桌面壳:Electron 主进程内嵌启动官方 DSH Host,通过 loopback HTTP/WebSocket 提供原生窗口、系统托盘、profile 管理与内置 pnpm 运行时。
 
-本仓库是 [deepseek-harness-desktop](https://github.com/anywhere-labs/deepseek-harness-desktop) 2.0.2 的 Arch 适配分支:保留上游全部桌面代码,**新增 Linux/Arch 打包链路**,上游 DeepSeek Harness 以 git 子模块固定版本(见 [upstream.json](upstream.json)),永不修改。
+本仓库是社区开源的 DSH Desktop(MIT)2.0.2 的 **Arch Linux 适配版**:在完整桌面代码之上**新增 Linux/Arch 打包链路**;官方 DeepSeek Harness 以 git 子模块固定版本(见 [upstream.json](upstream.json)),永不修改。
 
 ## 在 Arch Linux 上安装
 

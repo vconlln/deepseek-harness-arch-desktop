@@ -55,10 +55,10 @@ const rawCatalog = {
     revision: 'sha256:fixture',
   },
   packages: [{
-    id: 'anywhere-labs/deepseek-harness-desktop/dsh-plugin-desktop',
+    id: 'vconlln/deepseek-harness-arch-desktop/dsh-plugin-desktop',
     name: 'deepseek-harness-desktop',
-    owner: 'anywhere-labs',
-    url: 'https://github.com/anywhere-labs/deepseek-harness-desktop',
+    owner: 'vconlln',
+    url: 'https://github.com/vconlln/deepseek-harness-arch-desktop',
     category: 'dev',
     description: { en: 'Desktop shell', zh: '桌面外壳' },
     pushedAt: '2026-08-17T05:45:19Z',
@@ -175,10 +175,10 @@ describe('1024Store adapter', () => {
       id: rawCatalog.packages[0]!.id,
       summary: 'Desktop shell',
       repository: {
-        url: 'https://github.com/anywhere-labs/deepseek-harness-desktop',
+        url: 'https://github.com/vconlln/deepseek-harness-arch-desktop',
         subdirectory: 'dsh-plugin-desktop',
       },
-      media: { icon: { assetRef: publisherAssetRef, role: 'publisher-avatar', alt: 'anywhere-labs' } },
+      media: { icon: { assetRef: publisherAssetRef, role: 'publisher-avatar', alt: 'vconlln' } },
       provenance: { sourceRecordId: source().sourceRecordId },
     })
     expect(JSON.stringify(snapshot)).not.toContain('unsafe-value')
@@ -187,9 +187,9 @@ describe('1024Store adapter', () => {
       providerRevision: 'sha256:fixture',
     })
     expect(register).toHaveBeenCalledWith({
-      remoteUrl: 'https://github.com/anywhere-labs.png?size=96',
+      remoteUrl: 'https://github.com/vconlln.png?size=96',
       role: 'publisher-avatar',
-      alt: 'anywhere-labs',
+      alt: 'vconlln',
       sourceRecordId: source().sourceRecordId,
       itemId: rawCatalog.packages[0]!.id,
       allowedHostnames: ['github.com', 'avatars.githubusercontent.com'],
@@ -355,9 +355,9 @@ describe('1024Store adapter', () => {
   it('does not silently treat a truncated 1024Store response as the complete catalog', async () => {
     const packages = Array.from({ length: 51 }, (_, index) => ({
       ...rawCatalog.packages[0]!,
-      id: `anywhere-labs/plugin-${index}`,
+      id: `vconlln/plugin-${index}`,
       name: `plugin-${index}`,
-      url: `https://github.com/anywhere-labs/plugin-${index}`,
+      url: `https://github.com/vconlln/plugin-${index}`,
     }))
     const http: CatalogHttpClient = {
       getJson: vi.fn(async () => ({
@@ -378,9 +378,9 @@ describe('1024Store adapter', () => {
   it('fails a complete 1024Store scan when provider metadata says more items exist', async () => {
     const packages = Array.from({ length: 51 }, (_, index) => ({
       ...rawCatalog.packages[0]!,
-      id: `anywhere-labs/plugin-${index}`,
+      id: `vconlln/plugin-${index}`,
       name: `plugin-${index}`,
-      url: `https://github.com/anywhere-labs/plugin-${index}`,
+      url: `https://github.com/vconlln/plugin-${index}`,
     }))
     const http: CatalogHttpClient = {
       getJson: vi.fn(async () => ({
@@ -398,9 +398,9 @@ describe('1024Store adapter', () => {
   it('keeps the reviewed 1024Store adapter page size fixed at 50', async () => {
     const packages = Array.from({ length: 51 }, (_, index) => ({
       ...rawCatalog.packages[0]!,
-      id: `anywhere-labs/plugin-${index}`,
+      id: `vconlln/plugin-${index}`,
       name: `plugin-${index}`,
-      url: `https://github.com/anywhere-labs/plugin-${index}`,
+      url: `https://github.com/vconlln/plugin-${index}`,
     }))
     const http: CatalogHttpClient = {
       getJson: vi.fn(async () => ({
@@ -804,9 +804,9 @@ describe('catalog active-source reads', () => {
     await store.save([first, second])
     const secondItem = {
       ...rawCatalog.packages[0]!,
-      id: 'anywhere-labs/second-plugin',
+      id: 'vconlln/second-plugin',
       name: 'second-plugin',
-      url: 'https://github.com/anywhere-labs/second-plugin',
+      url: 'https://github.com/vconlln/second-plugin',
     }
     const getJson = vi.fn(async () => ({
       value: { ...rawCatalog, packages: [...rawCatalog.packages, secondItem] },
@@ -842,9 +842,9 @@ describe('catalog active-source reads', () => {
     await store.save([record])
     const secondItem = {
       ...rawCatalog.packages[0]!,
-      id: 'anywhere-labs/second-plugin',
+      id: 'vconlln/second-plugin',
       name: 'second-plugin',
-      url: 'https://github.com/anywhere-labs/second-plugin',
+      url: 'https://github.com/vconlln/second-plugin',
     }
     const getJson = vi.fn(async () => ({
       value: { ...rawCatalog, packages: [...rawCatalog.packages, secondItem] },
@@ -877,9 +877,9 @@ describe('catalog active-source reads', () => {
     await store.save([first, second])
     const secondItem = {
       ...rawCatalog.packages[0]!,
-      id: 'anywhere-labs/second-plugin',
+      id: 'vconlln/second-plugin',
       name: 'second-plugin',
-      url: 'https://github.com/anywhere-labs/second-plugin',
+      url: 'https://github.com/vconlln/second-plugin',
     }
     const getJson = vi.fn(async () => ({
       value: { ...rawCatalog, packages: [...rawCatalog.packages, secondItem] },
@@ -908,9 +908,9 @@ describe('catalog active-source reads', () => {
     await store.save([record])
     const secondItem = {
       ...rawCatalog.packages[0]!,
-      id: 'anywhere-labs/second-plugin',
+      id: 'vconlln/second-plugin',
       name: 'second-plugin',
-      url: 'https://github.com/anywhere-labs/second-plugin',
+      url: 'https://github.com/vconlln/second-plugin',
     }
     const getJson = vi.fn(async () => ({
       value: { ...rawCatalog, packages: [...rawCatalog.packages, secondItem] },
@@ -1062,9 +1062,9 @@ describe('catalog active-source reads', () => {
     await store.save([source()])
     const secondItem = {
       ...rawCatalog.packages[0]!,
-      id: 'anywhere-labs/second-plugin',
+      id: 'vconlln/second-plugin',
       name: 'second-plugin',
-      url: 'https://github.com/anywhere-labs/second-plugin',
+      url: 'https://github.com/vconlln/second-plugin',
     }
     const getJson = vi.fn()
       .mockResolvedValueOnce({
@@ -1170,9 +1170,9 @@ describe('catalog active-source reads', () => {
     await store.save([first])
     const secondItem = {
       ...rawCatalog.packages[0]!,
-      id: 'anywhere-labs/second-plugin',
+      id: 'vconlln/second-plugin',
       name: 'second-plugin',
-      url: 'https://github.com/anywhere-labs/second-plugin',
+      url: 'https://github.com/vconlln/second-plugin',
     }
     const completeCatalog = { ...rawCatalog, packages: [...rawCatalog.packages, secondItem] }
     const getJson = vi.fn()

@@ -12,11 +12,11 @@ import {
 } from '../src/media/index.js'
 
 const candidate = (overrides: Partial<MarketMediaCandidate> = {}): MarketMediaCandidate => ({
-  remoteUrl: 'https://github.com/anywhere-labs.png?size=128',
+  remoteUrl: 'https://github.com/vconlln.png?size=128',
   role: 'publisher-avatar',
   alt: 'Anywhere Labs',
   sourceRecordId: '018f1f77-a5c4-7b73-a9ae-0242ac120002',
-  itemId: 'anywhere-labs/deepseek-harness-desktop',
+  itemId: 'vconlln/deepseek-harness-arch-desktop',
   allowedHostnames: ['github.com', 'avatars.githubusercontent.com'],
   ...overrides,
 })
@@ -46,7 +46,7 @@ describe('market media service', () => {
       return {
         body: input,
         contentType: 'image/jpeg' as const,
-        finalUrl: 'https://github.com/anywhere-labs.png?size=128',
+        finalUrl: 'https://github.com/vconlln.png?size=128',
       }
     })
     const service = createMarketMediaService({ fetchImage })
@@ -152,7 +152,7 @@ describe('market media service', () => {
     await expect(normalizeMarketImage({
       body,
       contentType: 'image/jpeg',
-      finalUrl: 'https://github.com/anywhere-labs.png',
+      finalUrl: 'https://github.com/vconlln.png',
     })).rejects.toMatchObject({ code: 'invalid-image' })
   })
 })
@@ -181,17 +181,17 @@ describe('restricted market image fetcher', () => {
   it('validates remote image URLs against the exact reviewed host set', () => {
     const allowed = new Set(['github.com', 'avatars.githubusercontent.com'])
 
-    expect(validateRemoteImageUrl('https://github.com/anywhere-labs.png?size=128', allowed).href)
-      .toBe('https://github.com/anywhere-labs.png?size=128')
-    expect(validateRemoteImageUrl('https://github.com:443/anywhere-labs.png', allowed).href)
-      .toBe('https://github.com/anywhere-labs.png')
+    expect(validateRemoteImageUrl('https://github.com/vconlln.png?size=128', allowed).href)
+      .toBe('https://github.com/vconlln.png?size=128')
+    expect(validateRemoteImageUrl('https://github.com:443/vconlln.png', allowed).href)
+      .toBe('https://github.com/vconlln.png')
 
     for (const value of [
-      'http://github.com/anywhere-labs.png',
-      'https://github.com:444/anywhere-labs.png',
-      'https://user:pass@github.com/anywhere-labs.png',
-      'https://github.com/anywhere-labs.png#fragment',
-      'https://github.com.attacker.example/anywhere-labs.png',
+      'http://github.com/vconlln.png',
+      'https://github.com:444/vconlln.png',
+      'https://user:pass@github.com/vconlln.png',
+      'https://github.com/vconlln.png#fragment',
+      'https://github.com.attacker.example/vconlln.png',
       'not a url',
     ]) {
       expect(() => validateRemoteImageUrl(value, allowed), value)
