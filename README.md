@@ -1,108 +1,89 @@
 # DSH Desktop · Arch Linux 适配版
 
-DeepSeek Harness 的 **桌面客户端(Arch Linux 版)**:一个带窗口的 AI 编程助手,内置系统托盘、多 Profile 管理、插件市场、内置 pnpm 运行环境,Agent 的文件系统沙箱优先 bubblewrap、自动回退 Landlock。
+DeepSeek Harness 的桌面客户端,Arch Linux 适配。Electron 壳内嵌官方 Host,自带系统托盘、多 Profile、插件市场与内置 pnpm 运行时。Agent 文件沙箱优先 bubblewrap,缺失时回退 Landlock。
 
----
+## 要求
 
-## 🚀 三步上手(选一条路)
+- Arch Linux x86_64
+- Node.js >= 22.19
+- git
 
-### 路 A:你机器上已经有安装包(最快)
+## 构建
 
-如果 `dsh-plugin-desktop/dist/` 里已有产物(本仓库开发机就有),直接装:
+```sh
+git clone --recurse-submodules https://github.com/vconlln/deepseek-harness-arch-desktop.git
+cd deepseek-harness-arch-desktop
+corepack enable
+corepack yarn install --immutable
+corepack yarn dist:linux
+```
+
+产物:
+
+```text
+dsh-plugin-desktop/dist/DSH-Desktop-2.0.2-x64.pacman
+dsh-plugin-desktop/dist/DSH-Desktop-2.0.2-x64.AppImage
+```
+
+`dist:linux` 先跑 `check:linux-package` 门禁(构建、类型检查、打包相关测试、运行时闭包校验),再由 electron-builder 出包,最后经 `scripts/verify-linux-package.ts` 校验产物结构。
+
+## 安装
 
 ```sh
 sudo pacman -U dsh-plugin-desktop/dist/DSH-Desktop-2.0.2-x64.pacman
 ```
 
-装完在应用菜单找到 **DSH Desktop** 打开即可。卸载:
+包名 `dsh-plugin-desktop`,卸载:
 
 ```sh
 sudo pacman -R dsh-plugin-desktop
 ```
 
-### 路 B:从源码打包(任何时候都可行,约 5 分钟)
+应用装在 `/opt/DSH Desktop/`;包的 post_install 钩子会创建 `/usr/bin/dsh-desktop`。
 
-**前提**:Arch Linux x64、Node.js 22.19 以上、能联网。
+不安装、直接运行:
 
 ```sh
-# 1. 拉取代码(会自动带上官方引擎)
-git clone --recurse-submodules https://github.com/vconlln/deepseek-harness-arch-desktop.git
-cd deepseek-harness-arch-desktop
-
-# 2. 安装依赖(需要几分钟,下载 Electron 等)
-corepack enable
-corepack yarn install --immutable
-
-# 3. 出包(自动跑检查 → 打包 → 校验产物)
-corepack yarn dist:linux
+./DSH-Desktop-2.0.2-x64.AppImage --appimage-extract-and-run
 ```
 
-完成后安装包就在这里:
+装有 `fuse2` 时可直接执行,否则用上面的 extract-and-run 方式。
+
+## 可选依赖
+
+- `bubblewrap`:Agent 文件沙箱后端;未安装时自动回退 Landlock
+- `fuse2`:直接运行 AppImage 所需
+
+## 发布
+
+GitHub Releases 目前为空。发布一次之后,Releases 下载与 AUR 安装才可用:
+
+1. 仓库页面创建 Release,tag `v2.0.2`,上传上面两个产物;
+2. 更新 `dsh-plugin-desktop/aur/PKGBUILD`:`_owner` 改为 `vconlln`,用 `sha256sum` 的结果替换 `sha256sums=('SKIP')`;
+3. 之后即可 `yay -S deepseek-harness-desktop-bin`。
+
+## 测试
+
+```sh
+corepack yarn check
+```
+
+全量门禁:双语文档配对、布局校验、构建、类型检查、单元测试、运行时闭包。
+
+## 目录
 
 ```text
-dsh-plugin-desktop/dist/DSH-Desktop-2.0.2-x64.pacman     ← pacman 安装包
-dsh-plugin-desktop/dist/DSH-Desktop-2.0.2-x64.AppImage   ← 免安装直跑版
-```
-
-```sh
-sudo pacman -U dsh-plugin-desktop/dist/DSH-Desktop-2.0.2-x64.pacman
-```
-
-### 路 C:AppImage 免安装直跑(不想动系统时)
-
-```sh
-chmod +x DSH-Desktop-2.0.2-x64.AppImage
-./DSH-Desktop-2.0.2-x64.AppImage
-```
-
-> AppImage 需要 `fuse2` 包;没装的话改用 `./DSH-Desktop-2.0.2-x64.AppImage --appimage-extract-and-run`。
-
----
-
-## 📦 让别人也能下载(维护者做一次,做完 AUR 才生效)
-
-**当前 GitHub Releases 还是空的**,所以上面的路 A/C 对"别人"暂时不可用。发布一次即可:
-
-1. 打开仓库页面 → **Releases → Create a new release**;
-2. Tag 填 `v2.0.2`,标题随意;
-3. 上传 `dsh-plugin-desktop/dist/DSH-Desktop-2.0.2-x64.pacman` 和 `.AppImage`,点发布;
-4. 更新 [dsh-plugin-desktop/aur/PKGBUILD](dsh-plugin-desktop/aur/PKGBUILD):把 `_owner` 改成 `vconlln`,用 `sha256sum` 算出校验和替换 `SKIP`,推送到仓库。
-
-做完这些,别人就能:
-
-```sh
-# 从 Releases 下载安装包(网页点一下就行)
-# 或通过 AUR 助手一键安装
-yay -S deepseek-harness-desktop-bin
-```
-
----
-
-## ❓ 常见问题
-
-| 问题 | 解决 |
-|---|---|
-| Releases 是空的,下载不了 | 用「路 B 从源码打包」,或让维护者按上一节发布一次 |
-| `corepack: 未找到命令` | `sudo npm install -g corepack`,然后重新执行 `corepack enable` |
-| `pacman -U` 提示权限不足 | 加 `sudo`(安装到系统目录需要 root) |
-| 沙箱相关 | Agent 操作文件时优先用 bubblewrap(`sudo pacman -S bubblewrap`),没装会自动退回 Landlock,不影响使用 |
-| 打出来的包怎么验证 | 出包命令自带校验器,检查 ASAR、启动器、桌面入口、图标;也可以跑 `corepack yarn check` 全量自检 |
-
----
-
-## 🗂 目录结构(想改代码时看)
-
-```text
-dsh-plugin-desktop/  桌面端主体:窗口/托盘/Profile/插件市场/打包脚本
-  scripts/package-linux.ts        出包入口(自动跑门禁 + 打包 + 校验)
-  scripts/verify-linux-package.ts 产物校验器
-  aur/                            AUR 包文件(PKGBUILD、desktop 参考、说明)
-dsh-community-market/  插件市场(随桌面端一起打包)
-dsh-community-fabric/  社区互操作规范文档
-deepseek-harness/      官方引擎的固定版本(子模块,不要改)
+dsh-plugin-desktop/   桌面端主体与打包脚本
+  scripts/package-linux.ts        出包入口
+  scripts/verify-linux-package.ts 产物校验
+  aur/                            PKGBUILD 与 desktop 参考
+dsh-community-market/  插件市场(随桌面端打包)
+dsh-community-fabric/  社区互操作规范
+deepseek-harness/      官方上游固定版本(git 子模块)
 docs/superpowers/specs/ Arch 适配设计文档
 ```
 
-## 📄 许可证
+## License
 
-MIT。原始代码版权归 Anywhere Labs(法律要求保留声明),Arch 适配部分版权归 vconlln。
+MIT。原始代码版权归 Anywhere Labs,Arch 适配部分版权归 vconlln。
+
