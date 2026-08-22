@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=DSH Desktop
+Comment=DeepSeek Harness 桌面端
+Exec=dsh-desktop
+Icon=dsh-desktop
+Terminal=false
+Type=Application
+Categories=Development;Utility;
+StartupWMClass=DSH Desktop

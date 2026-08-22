@@ -1,0 +1,33 @@
+# Maintainer: DSH Desktop Arch Adaptation <noreply@deepseek.com>
+#
+# deepseek-harness-desktop-bin: DSH Desktop 的二进制 AUR 包。
+# 它下载上游 release 的 .pacman 产物并解包,不做二次编译。
+#
+# 发布流程:
+#   1. 在 deepseek-harness-desktop-arch 仓库执行 corepack yarn dist:linux;
+#   2. 上传 dist/DSH-Desktop-<version>-x64.pacman 到 GitHub Release(v<pkgver> 标签);
+#   3. 更新下方 pkgver 与 sha256sums(sha256sum 产物的前 64 位十六进制),提交 AUR。
+# 首次发布前 sha256sums 保持 SKIP。
+
+_owner=deepseek-ai # 提交 AUR 前替换为实际的 GitHub owner
+
+pkgname=deepseek-harness-desktop-bin
+pkgver=2.0.2
+pkgrel=1
+pkgdesc='DSH Desktop: DeepSeek Harness 的 Electron 桌面端(Arch Linux 适配)'
+arch=(x86_64)
+url='https://github.com/deepseek-ai/deepseek-harness'
+license=(MIT)
+depends=(gtk3 nss alsa-lib libxss)
+optdepends=(
+  'bubblewrap: 文件系统沙箱后端,未安装时自动回退 Landlock'
+  'fuse2: 运行 AppImage 版本时需要'
+)
+provides=("deepseek-harness-desktop=${pkgver}")
+conflicts=(deepseek-harness-desktop)
+source=("DSH-Desktop-${pkgver}-x64.pacman::https://github.com/${_owner}/deepseek-harness-desktop-arch/releases/download/v${pkgver}/DSH-Desktop-${pkgver}-x64.pacman")
+sha256sums=('SKIP')
+
+package() {
+  bsdtar -xf "${srcdir}/DSH-Desktop-${pkgver}-x64.pacman" -C "${pkgdir}"
+}
