@@ -75,7 +75,7 @@ describe('Linux x64 artifact packaging', () => {
       command: '/usr/bin/node',
       args: ['/repo/dsh-plugin-desktop/scripts/verify-linux-package.ts'],
       cwd: '/repo/dsh-plugin-desktop',
-      env: { PATH: '/usr/bin', SAFE_VALUE: 'kept' },
+      env: { PATH: '/usr/bin' },
     })
     expect(logs).toEqual([
       'Building unsigned Linux x64 artifacts: pacman and AppImage.',

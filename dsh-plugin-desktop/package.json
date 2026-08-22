@@ -356,7 +356,7 @@
           ]
         }
       ],
-      "artifactName": "DSH-Desktop-${version}-${arch}.${ext}",
+      "artifactName": "DSH-Desktop-${version}-x64.${ext}",
       "executableName": "dsh-desktop",
       "icon": "build/app-icon.png",
       "maintainer": "DeepSeek AI <noreply@deepseek.com>",
@@ -368,7 +368,6 @@
         "entry": {
           "Name": "DSH Desktop",
           "Comment": "DeepSeek Harness 桌面端",
-          "Exec": "/usr/bin/dsh-desktop",
           "Icon": "dsh-desktop",
           "Terminal": "false",
           "Type": "Application",

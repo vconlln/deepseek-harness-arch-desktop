@@ -6,17 +6,18 @@ import {
 } from '../scripts/verify-linux-package.ts'
 
 const ELF_HEADER = Buffer.from([0x7f, 0x45, 0x4c, 0x46])
+const APP_DIR = 'opt/DSH Desktop'
 
 const DESKTOP_CONTENT = [
   '[Desktop Entry]',
   'Name=DSH Desktop',
-  'Comment=DeepSeek Harness 桌面端',
-  'Exec=/usr/bin/dsh-desktop',
-  'Icon=dsh-desktop',
+  'Exec="/opt/DSH Desktop/dsh-desktop" %U',
   'Terminal=false',
   'Type=Application',
-  'Categories=Development;Utility;',
+  'Icon=dsh-desktop',
   'StartupWMClass=DSH Desktop',
+  'Comment=DSH Desktop: an Electron shell composed as a DeepSeek Harness Cordis plugin',
+  'Categories=Development;',
   '',
 ].join('\n')
 
@@ -27,11 +28,12 @@ function options(overrides: Partial<LinuxPackageVerificationOptions> = {}): Linu
     distDir: '/repo/dsh-plugin-desktop/dist',
     bsdtarCommand: 'bsdtar',
     listArchive: () => [
-      'usr/bin/dsh-desktop',
-      'usr/lib/dsh-desktop/resources/app.asar',
-      'usr/lib/dsh-desktop/resources/app.asar.unpacked/package.json',
+      '.INSTALL',
+      `${APP_DIR}/dsh-desktop`,
+      `${APP_DIR}/resources/app.asar`,
+      `${APP_DIR}/resources/app.asar.unpacked/package.json`,
       'usr/share/applications/dsh-desktop.desktop',
-      'usr/share/icons/hicolor/256x256/apps/dsh-desktop.png',
+      'usr/share/icons/hicolor/1024x1024/apps/dsh-desktop.png',
     ],
     readArchiveEntry: (_archivePath, entryName) => {
       if (entryName === 'usr/share/applications/dsh-desktop.desktop') return DESKTOP_CONTENT
@@ -68,25 +70,23 @@ describe('Linux package verification', () => {
   })
 
   it('aggregates every missing artifact and entry violation into one error', () => {
-    const error = () => verifyLinuxPackage(options({
-      listArchive: () => ['usr/bin/dsh-desktop'],
-      statArtifact: () => ({ isFile: () => true, size: 0, mode: 0o100644 }),
-      readFile: () => Buffer.from([0x7f, 0x45, 0x4c, 0x46]),
-    }))
-    const message = (() => {
+    const cause = (() => {
       try {
-        error()
+        verifyLinuxPackage(options({
+          listArchive: () => [`${APP_DIR}/dsh-desktop`],
+          statArtifact: () => ({ isFile: () => true, size: 0, mode: 0o100644 }),
+        }))
         return ''
-      } catch (cause) {
-        return cause instanceof Error ? cause.message : String(cause)
+      } catch (error) {
+        return error instanceof Error ? error.message : String(error)
       }
     })()
-    expect(message).toContain('artifact is not a non-empty regular file')
-    expect(message).toContain('pacman archive is missing the resources/app.asar entry')
-    expect(message).toContain('pacman archive is missing the resources/app.asar.unpacked tree')
-    expect(message).toContain('pacman archive is missing usr/share/applications/dsh-desktop.desktop')
-    expect(message).toContain('pacman archive is missing a hicolor dsh-desktop.png icon')
-    expect(message).toContain('AppImage must carry an executable bit')
+    expect(cause).toContain('artifact is not a non-empty regular file')
+    expect(cause).toContain('pacman archive is missing the resources/app.asar entry')
+    expect(cause).toContain('pacman archive is missing usr/share/applications/dsh-desktop.desktop')
+    expect(cause).toContain('pacman archive is missing a hicolor dsh-desktop.png icon')
+    expect(cause).toContain('pacman archive is missing the .INSTALL hook that creates /usr/bin/dsh-desktop')
+    expect(cause).toContain('AppImage must carry an executable bit')
   })
 
   it('rejects a non-ELF AppImage', () => {
@@ -108,7 +108,7 @@ describe('Linux package verification', () => {
           readArchiveEntry: () => [
             '[Desktop Entry]',
             'Name=DSH Desktop',
-            'Exec=/opt/DSH Desktop/dsh-desktop',
+            'Exec=/opt/elsewhere/dsh-desktop',
             'Icon=dsh-desktop',
             'Terminal=true',
             'Categories=Utility;',
@@ -121,7 +121,7 @@ describe('Linux package verification', () => {
         return error instanceof Error ? error.message : String(error)
       }
     })()
-    expect(cause).toContain('desktop entry Exec must be /usr/bin/dsh-desktop')
+    expect(cause).toContain('desktop entry Exec must be')
     expect(cause).toContain('desktop entry Terminal must be false')
     expect(cause).toContain('desktop entry Categories must include Development')
     expect(cause).toContain('desktop entry StartupWMClass must be DSH Desktop')

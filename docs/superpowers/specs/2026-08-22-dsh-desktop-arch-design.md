@@ -42,12 +42,13 @@
 全部校验函数导出为纯函数并注入 runner/路径,测试可无真产物运行:
 
 1. **产物存在与命名**: dist/DSH-Desktop-<version>-x64.pacman 与 DSH-Desktop-<version>-x64.AppImage 存在(命名走 build.linux.artifactName 单一来源,版本从 package.json 读取);
-2. **.pacman 内容**(用 bsdtar -tf 列表,缺 bsdtar 时报错提示安装 libarchive): 必须包含
-   - usr/bin/dsh-desktop(启动器)、
-   - usr/lib/dsh-desktop/resources/app.asar 与 app.asar.unpacked(ASAR 与物理依赖树)、
+2. **.pacman 内容**(用 bsdtar 模式限定列表,避免全量列表;缺 bsdtar 时报错提示安装 libarchive): 必须包含
+   - 由 resources/app.asar 位置推导出的应用目录(实测为 /opt/DSH Desktop/)及同目录启动器 dsh-desktop、
+   - resources/app.asar 与 app.asar.unpacked 树(用树内 package.json 单条证明,避免通配展开 2.5 万条目)、
    - usr/share/applications/dsh-desktop.desktop、
-   - usr/share/icons/hicolor/*/apps/dsh-desktop.png;
-3. **desktop entry**(解包后解析): Exec=/usr/bin/dsh-desktop、Icon=dsh-desktop、Name=DSH Desktop、Categories 含 Development、Terminal=false、StartupWMClass=DSH Desktop;
+   - usr/share/icons/hicolor/*/apps/dsh-desktop.png、
+   - .INSTALL 钩子(实测其 post_install 经 update-alternatives/ln -sf 创建 /usr/bin/dsh-desktop 软链,并处理 chrome-sandbox、mime/desktop 数据库与 AppArmor profile);
+3. **desktop entry**(解包后解析): Exec 为带引号的真实启动器路径 + %U(实测 `"/opt/DSH Desktop/dsh-desktop" %U`)、Icon=dsh-desktop、Name=DSH Desktop、Categories 含 Development、Terminal=false、StartupWMClass=DSH Desktop;
 4. **AppImage 外壳**: 文件以 0x7f 与 ELF 三字节开头、具有执行位;
 5. 任何一项失败,汇总所有缺失项一次性抛错(而不是逐条早退)。
 
@@ -111,7 +112,7 @@ dist:linux(根) -> market build -> dsh-plugin-desktop build(tsdown + tsc)
 1. 原仓库 deepseek-harness-desktop 零改动(git status 干净);
 2. 新仓库 corepack yarn check 全绿(含既有 headless 门禁);
 3. corepack yarn dist:linux 产出两个命名正确的产物,verify-linux-package 通过;
-4. 干装冒烟(无 root): bsdtar 解包 .pacman 到临时根,校验 usr/ 布局与启动器 ELF,复用 afterPack 诊断 worker 冒烟结果;若环境可提权,另做 pacman -U --root 真装;
+4. 干装冒烟(无 root): bsdtar 解包 .pacman 到临时根,校验 /opt/DSH Desktop/ 布局、启动器 ELF(实测通过);有显示环境时短暂启动打包产物,确认桌面日志/lifecycle-events/内置 pnpm 运行时落盘(实测通过);若环境可提权,另做 pacman -U --root 真装;
 5. 新增三个 vitest 文件全绿;
 6. git 上游子模块 diff 为空(上游子模块未动)。
 

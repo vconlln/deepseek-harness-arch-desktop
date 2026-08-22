@@ -654,11 +654,10 @@ describe('published package surface', () => {
       { target: 'AppImage', arch: ['x64'] },
     ])
     expect(manifest.build?.linux?.executableName).toBe('dsh-desktop')
-    expect(manifest.build?.linux?.artifactName).toBe('DSH-Desktop-${version}-${arch}.${ext}')
+    expect(manifest.build?.linux?.artifactName).toBe('DSH-Desktop-${version}-x64.${ext}')
     expect(manifest.build?.linux?.maintainer).toBe('DeepSeek AI <noreply@deepseek.com>')
     expect(manifest.build?.linux?.desktop?.entry).toEqual(expect.objectContaining({
       Name: 'DSH Desktop',
-      Exec: '/usr/bin/dsh-desktop',
       Icon: 'dsh-desktop',
       Terminal: 'false',
       Categories: 'Development;Utility;',

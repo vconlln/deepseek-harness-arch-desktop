@@ -12,7 +12,7 @@ yay -S deepseek-harness-desktop-bin
 makepkg -si
 ```
 
-安装后启动器为 `/usr/bin/dsh-desktop`,桌面入口由 pacman hooks 自动注册。
+安装后应用位于 `/opt/DSH Desktop/`,`post_install` 钩子会创建 `/usr/bin/dsh-desktop` 软链;桌面入口由 pacman hooks 自动注册。
 
 ## 依赖
 

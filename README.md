@@ -14,7 +14,7 @@ DSH Desktop 的 **Arch Linux 发行版**。它是 DeepSeek Harness 的 Electron 
 sudo pacman -U DSH-Desktop-<version>-x64.pacman
 ```
 
-安装位置:应用本体在包内自带 Electron 运行时,启动器为 `/usr/bin/dsh-desktop`,桌面入口 `dsh-desktop.desktop` 由 pacman hooks 自动注册。
+安装位置:应用本体与自带 Electron 运行时安装在 `/opt/DSH Desktop/`;包的 `post_install` 钩子创建 `/usr/bin/dsh-desktop` 软链,桌面入口 `dsh-desktop.desktop` 由 pacman hooks 自动注册。
 
 ### 方式二:AUR
 

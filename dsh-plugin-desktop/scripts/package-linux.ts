@@ -154,11 +154,13 @@ export function packageLinuxArtifacts(options: LinuxPackageOptions): void {
       CSC_IDENTITY_AUTO_DISCOVERY: 'false',
     },
   )
+  // The verifier only needs PATH to locate bsdtar; keep its environment
+  // minimal so a large inherited environment cannot break child spawns.
   options.run(
     options.nodeExecutable,
     [options.verifier],
     options.desktopRoot,
-    cleanEnvironment,
+    { PATH: cleanEnvironment.PATH ?? '' },
   )
 }
 

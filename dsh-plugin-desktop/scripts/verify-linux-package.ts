@@ -7,6 +7,20 @@ import { spawnSync } from 'node:child_process'
 
 const ELF_MAGIC = Buffer.from([0x7f, 0x45, 0x4c, 0x46]) // 0x7f 'E' 'L' 'F'
 
+/**
+ * The archive paths this verifier resolves. Pattern-scoped listing keeps the
+ * child output small (a full listing of a ~130MB archive can exhaust the
+ * synchronous pipe buffer under constrained environments).
+ */
+const ARCHIVE_PATTERNS = [
+  '.INSTALL',
+  'usr/share/applications/dsh-desktop.desktop',
+  'usr/share/icons/hicolor/*/apps/dsh-desktop.png',
+  '*resources/app.asar',
+  '*resources/app.asar.unpacked/package.json',
+  '*/dsh-desktop',
+] as const
+
 /** Archive and filesystem primitives injected so tests run without real artifacts. */
 export interface LinuxPackageVerificationOptions {
   /** Desktop package root containing package.json and dist. */
@@ -17,8 +31,8 @@ export interface LinuxPackageVerificationOptions {
   readonly distDir: string
   /** bsdtar executable used to inspect the pacman archive. */
   readonly bsdtarCommand: string
-  /** List the entries of one archive; rejects on archive failure. */
-  readonly listArchive: (archivePath: string) => string[]
+  /** List matching archive entries; rejects on archive failure. */
+  readonly listArchive: (archivePath: string, patterns: readonly string[]) => string[]
   /** Read one regular-file entry out of an archive; rejects when absent. */
   readonly readArchiveEntry: (archivePath: string, entryName: string) => string
   /** Stat one artifact path. */
@@ -37,8 +51,8 @@ function readVersion(desktopRoot: string): string {
   return manifest.version
 }
 
-function listWithBsdtar(command: string, archivePath: string): string[] {
-  const result = spawnSync(command, ['-tf', archivePath], {
+function listWithBsdtar(command: string, archivePath: string, patterns: readonly string[]): string[] {
+  const result = spawnSync(command, ['-tf', archivePath, ...patterns], {
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
   })
@@ -72,7 +86,7 @@ function defaultOptions(): LinuxPackageVerificationOptions {
     version: readVersion(desktopRoot),
     distDir: join(desktopRoot, 'dist'),
     bsdtarCommand: 'bsdtar',
-    listArchive: archivePath => listWithBsdtar('bsdtar', archivePath),
+    listArchive: (archivePath, patterns) => listWithBsdtar('bsdtar', archivePath, patterns),
     readArchiveEntry: (archivePath, entryName) => readWithBsdtar('bsdtar', archivePath, entryName),
     statArtifact: artifactPath => statSync(artifactPath),
     readFile: filePath => readFileSync(filePath),
@@ -125,25 +139,36 @@ export function verifyLinuxPackage(
 
   let entries: string[] | undefined
   try {
-    entries = options.listArchive(pacmanPath).map(normalizeEntry)
+    entries = options.listArchive(pacmanPath, ARCHIVE_PATTERNS).map(normalizeEntry)
   } catch (error) {
     violations.push(error instanceof Error ? error.message : String(error))
   }
   if (entries !== undefined) {
-    const hasEntry = (candidate: string, directory = false): boolean =>
-      entries!.some(entry => entry === candidate || (directory && entry.startsWith(`${candidate}/`)))
-    expect(hasEntry('usr/bin/dsh-desktop'), 'pacman archive is missing usr/bin/dsh-desktop')
-    expect(entries.some(entry => entry === 'resources/app.asar' || entry.endsWith('/resources/app.asar')), 'pacman archive is missing the resources/app.asar entry')
-    expect(entries.some(entry => entry === 'resources/app.asar.unpacked'
-      || entry.endsWith('/resources/app.asar.unpacked')
-      || entry.includes('/resources/app.asar.unpacked/')), 'pacman archive is missing the resources/app.asar.unpacked tree')
-    expect(hasEntry('usr/share/applications/dsh-desktop.desktop'), 'pacman archive is missing usr/share/applications/dsh-desktop.desktop')
+    // The electron-builder pacman layout installs the application under a
+    // product-named directory; resolve the real install prefix from the asar.
+    const appAsar = entries.find(entry => entry === 'resources/app.asar' || entry.endsWith('/resources/app.asar'))
+    const appDir = appAsar === undefined
+      ? undefined
+      : appAsar.slice(0, -'/resources/app.asar'.length)
+    expect(appAsar !== undefined && appDir !== undefined, 'pacman archive is missing the resources/app.asar entry')
+    if (appDir !== undefined) {
+      expect(entries.includes(`${appDir}/dsh-desktop`), `pacman archive is missing the launcher ${appDir}/dsh-desktop`)
+      expect(entries.some(entry => entry.startsWith(`${appDir}/resources/app.asar.unpacked/`)), 'pacman archive is missing the resources/app.asar.unpacked tree')
+    }
+    expect(entries.includes('usr/share/applications/dsh-desktop.desktop'), 'pacman archive is missing usr/share/applications/dsh-desktop.desktop')
     expect(entries.some(entry => /^usr\/share\/icons\/hicolor\/[^/]+\/apps\/dsh-desktop\.png$/u.test(entry)), 'pacman archive is missing a hicolor dsh-desktop.png icon')
+    // The /usr/bin/dsh-desktop PATH entry is created by the package's
+    // post_install hook, not shipped as an archive entry.
+    expect(entries.includes('.INSTALL'), 'pacman archive is missing the .INSTALL hook that creates /usr/bin/dsh-desktop')
     const desktopEntryName = 'usr/share/applications/dsh-desktop.desktop'
-    if (hasEntry(desktopEntryName)) {
+    if (entries.includes(desktopEntryName)) {
       try {
         const desktop = parseDesktopEntry(options.readArchiveEntry(pacmanPath, desktopEntryName))
-        expect(desktop['Exec'] === '/usr/bin/dsh-desktop', `desktop entry Exec must be /usr/bin/dsh-desktop, got ${String(desktop['Exec'])}`)
+        // Archive entries are relative, while the desktop Exec is absolute.
+        const launcher = appDir === undefined
+          ? undefined
+          : (appDir.startsWith('/') ? appDir : `/${appDir}`) + '/dsh-desktop'
+        expect(launcher !== undefined && desktop['Exec'] === `"${launcher}" %U`, `desktop entry Exec must be "${launcher}" %U, got ${String(desktop['Exec'])}`)
         expect(desktop['Icon'] === 'dsh-desktop', `desktop entry Icon must be dsh-desktop, got ${String(desktop['Icon'])}`)
         expect(desktop['Name'] === 'DSH Desktop', `desktop entry Name must be DSH Desktop, got ${String(desktop['Name'])}`)
         expect(desktop['Terminal'] === 'false', `desktop entry Terminal must be false, got ${String(desktop['Terminal'])}`)
