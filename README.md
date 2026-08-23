@@ -78,6 +78,7 @@ dsh-plugin-desktop/   桌面端主体与打包脚本
   scripts/verify-linux-package.ts 产物校验
   aur/                            PKGBUILD 与 desktop 参考
 dsh-community-market/  插件市场(随桌面端打包)
+dsh-plugin-wallpaper/  自有维护的壁纸插件(亚克力背景 + 壁纸设计面板)
 dsh-community-fabric/  社区互操作规范
 deepseek-harness/      官方上游固定版本(git 子模块)
 docs/superpowers/specs/ Arch 适配设计文档

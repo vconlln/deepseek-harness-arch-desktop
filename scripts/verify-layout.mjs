@@ -16,6 +16,7 @@ const upstream = readJson('upstream.json')
 const plugin = readJson('dsh-plugin-desktop/package.json')
 const fabric = readJson('dsh-community-fabric/package.json')
 const market = readJson('dsh-community-market/package.json')
+const wallpaper = readJson('dsh-plugin-wallpaper/package.json')
 const upstreamPackage = readJson('deepseek-harness/package.json')
 
 if (workspace.packageManager !== 'yarn@4.18.0') {
@@ -25,18 +26,21 @@ if (JSON.stringify(workspace.workspaces) !== JSON.stringify([
   'dsh-plugin-desktop',
   'dsh-community-fabric',
   'dsh-community-market',
+  'dsh-plugin-wallpaper',
 ])) {
-  fail('the root Yarn workspace must contain the desktop, community-fabric, and community-market packages')
+  fail('the root Yarn workspace must contain the desktop, community-fabric, community-market, and wallpaper packages')
 }
 for (const [name, manifest] of [
   ['dsh-plugin-desktop', plugin],
   ['dsh-community-fabric', fabric],
   ['dsh-community-market', market],
+  ['dsh-plugin-wallpaper', wallpaper],
 ]) {
   if (manifest.packageManager !== undefined) fail(`${name} must inherit the root Yarn release`)
 }
 if (fabric.name !== 'dsh-community-fabric') fail('the Fabric workspace must own dsh-community-fabric')
 if (market.name !== 'dsh-community-market') fail('the market workspace must own dsh-community-market')
+if (wallpaper.name !== 'dsh-wallpaper') fail('the wallpaper workspace must own dsh-wallpaper')
 const claudePath = resolve(root, 'CLAUDE.md')
 const claudeStat = lstatSync(claudePath)
 // Windows checkouts materialize the symlink as a regular file holding the
