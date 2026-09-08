@@ -4,11 +4,11 @@ Thank you for wanting to contribute to DSH Desktop. This is a community project 
 
 ## Regular users: use, report, and spread the word
 
-- Report problems or odd behavior in an [issue](https://github.com/anywhere-labs/deepseek-harness-desktop/issues): include your operating system (macOS / Windows), application version, and reproduction steps.
+- Report problems or odd behavior in an [issue](https://github.com/vconlln/deepseek-harness-arch-desktop/issues): include your operating system (macOS / Windows), application version, and reproduction steps.
 - Feature ideas and improvement suggestions are welcome as issues too.
-- Join the [community channels](README.en.md#community) (WeChat group, QQ group, Discord) and help other users.
+- Join the community channels (WeChat group, QQ group, Discord) and help other users.
 - Write tutorials or experience posts, or help improve and translate the documentation.
-- Suggest ecosystem projects for the [related links](README.en.md#friendly-links) section.
+- Suggest ecosystem projects for the related-links section.
 
 ## Plugin authors: extend the ecosystem
 
@@ -43,7 +43,7 @@ corepack yarn dev     # launch the application when a graphical session is avail
 - Use conventional commit messages (for example `fix(desktop): ...`, `docs: ...`).
 - Run `yarn check` and keep it green before committing.
 - After changing production dependencies, run `yarn workspace dsh-plugin-desktop verify:notices` to refresh the third-party notices and commit the updated `dsh-plugin-desktop/THIRD_PARTY_NOTICES.md`.
-- Documentation changes should stay bilingual and update the `README.i18n.yaml` hash record.
+- Documentation changes should stay bilingual and update the matching `.i18n.yaml` hash record; the root README is Chinese-only and has no pair to record.
 - Describe the change, its motivation, and how it was verified in the PR; merge after CI passes.
 
 ## Join the technical team

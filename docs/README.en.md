@@ -2,7 +2,7 @@
 
 [中文文档](README.md)
 
-This directory is the product and developer documentation index for DSH Desktop. The root [`README.en.md`](../README.en.md) is the short product entry point; these pages explain why the project exists, how to use it, and how to build plugins for it. Want to contribute? See [Contributing](../CONTRIBUTING.en.md).
+This directory is the product and developer documentation index for DSH Desktop. The root [`README.md`](../README.md) is the short Chinese product entry point; these pages explain why the project exists, how to use it, and how to build plugins for it. Want to contribute? See [Contributing](../CONTRIBUTING.en.md).
 
 ## Read by goal
 
@@ -35,13 +35,10 @@ Ordinary users can start with the [user guide](user-guide.en.md) and never need 
 
 ## How the README files are organized
 
-The outer repository has two formal product READMEs plus one legacy compatibility entry:
+This repository has a single root README:
 
-- [`README.md`](../README.md): the Chinese product entry point.
-- [`README.en.md`](../README.en.md): the English product entry point with the same product scope.
-- [`README.zh.md`](../README.zh.md): a legacy Chinese-path compatibility page with no independent content.
-
-`README.i18n.yaml` records the bilingual blob hashes for those two formal entry points; it is not a user guide. `dsh-plugin-desktop/README.md` and `dsh-plugin-desktop/README.zh.md` ship with the npm package and are the more technical package reference. `dsh-plugin-desktop/docs/` contains stable API contracts rather than marketing copy. `.agents/notes/implemented/` contains dated maintainer decision records and does not replace user documentation.
+- [`README.md`](../README.md): the Arch Linux adaptation product entry point (Chinese), and the only root README in this repository.
+- The original `README.en.md` / `README.zh.md` / `README.i18n.yaml` were removed with the Arch adaptation branch; the root-level bilingual pair is no longer maintained. `dsh-plugin-desktop/README.md` and `dsh-plugin-desktop/README.zh.md` ship with the npm package and are the more technical package reference. `dsh-plugin-desktop/docs/` contains stable API contracts rather than marketing copy. `.agents/notes/implemented/` contains dated maintainer decision records and does not replace user documentation.
 
 `deepseek-harness/` is the pinned upstream submodule. Its README and `docs/` belong to the upstream project, not to the Desktop product, and are excluded from the outer documentation inventory.
 

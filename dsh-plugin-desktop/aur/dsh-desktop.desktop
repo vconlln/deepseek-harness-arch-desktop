@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=DSH Desktop
+Exec="/opt/DSH Desktop/dsh-desktop" %U
+Terminal=false
+Type=Application
+Icon=dsh-desktop
+StartupWMClass=DSH Desktop
+Comment=DSH Desktop: an Electron shell composed as a DeepSeek Harness Cordis plugin
+Categories=Development;

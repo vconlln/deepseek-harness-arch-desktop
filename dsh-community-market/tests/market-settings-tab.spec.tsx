@@ -605,7 +605,7 @@ describe('MarketSettingsTab', () => {
     expect(support.parentElement?.textContent).toBe(
       `${en.operationRiskBeforeContact}${en.contactUs}${en.operationRiskAfterContact}`,
     )
-    expect(support.href).toBe('https://github.com/anywhere-labs/deepseek-harness-desktop/issues')
+    expect(support.href).toBe('https://github.com/vconlln/deepseek-harness-arch-desktop/issues')
     expect(support.target).toBe('_blank')
     expect(support.rel).toContain('noopener')
     expect(screen.getByText(en.restartAfterOperation)).toBeTruthy()
@@ -744,7 +744,7 @@ describe('MarketSettingsTab', () => {
     expect(await screen.findByText('not a standard plugin')).toBeTruthy()
     const details = screen.getByRole('link', { name: en.verificationDetails }) as HTMLAnchorElement
     expect(details.href).toBe(
-      'https://github.com/anywhere-labs/deepseek-harness-desktop/blob/master/dsh-community-market/docs/install-and-uninstall.md',
+      'https://github.com/vconlln/deepseek-harness-arch-desktop/blob/main/dsh-community-market/docs/install-and-uninstall.md',
     )
     expect(details.target).toBe('_blank')
     expect(details.rel).toContain('noopener')
@@ -872,12 +872,12 @@ describe('MarketSettingsTab', () => {
     fireEvent.click(screen.getByRole('button', { name: en.sources }))
 
     const contact = screen.getByRole('link', { name: en.sourcePartnershipContact }) as HTMLAnchorElement
-    expect(contact.href).toBe('https://github.com/anywhere-labs/deepseek-harness-desktop/issues')
+    expect(contact.href).toBe('https://github.com/vconlln/deepseek-harness-arch-desktop/issues')
     expect(contact.target).toBe('_blank')
     expect(contact.rel).toContain('noopener')
     const guide = screen.getByRole('link', { name: en.sourcePartnershipGuide }) as HTMLAnchorElement
     expect(guide.href).toBe(
-      'https://github.com/anywhere-labs/deepseek-harness-desktop/blob/master/dsh-community-market/docs/catalog-adapter-guide.md',
+      'https://github.com/vconlln/deepseek-harness-arch-desktop/blob/main/dsh-community-market/docs/catalog-adapter-guide.md',
     )
     expect(guide.target).toBe('_blank')
     expect(guide.rel).toContain('noopener')

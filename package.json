@@ -1,5 +1,5 @@
 {
-  "name": "deepseek-harness-desktop",
+  "name": "deepseek-harness-arch-desktop",
   "private": true,
   "description": "DSH Desktop product workspace",
   "license": "MIT",
@@ -11,7 +11,8 @@
     "dsh-plugin-desktop",
     "dsh-plugin-desktop-beta",
     "dsh-community-fabric",
-    "dsh-community-market"
+    "dsh-community-market",
+    "dsh-plugin-wallpaper"
   ],
   "resolutions": {
     "app-builder-lib@npm:26.15.7": "patch:app-builder-lib@npm%3A26.15.7#./patches/app-builder-lib@26.15.7.patch",
@@ -549,6 +550,8 @@
     "dist:mac-smoke": "yarn workspace dsh-community-market build && yarn workspace dsh-plugin-desktop dist:mac-smoke",
     "dist:win": "yarn workspace dsh-community-market build && yarn workspace dsh-plugin-desktop dist:win",
     "dist:win-portable": "yarn workspace dsh-community-market build && yarn workspace dsh-plugin-desktop dist:win-portable",
+    "dist:linux": "yarn workspace dsh-community-market build && yarn workspace dsh-plugin-desktop dist:linux",
+    "dist:arch": "yarn workspace dsh-community-market build && yarn workspace dsh-plugin-desktop dist:arch",
     "upstream:version": "cd deepseek-harness && corepack pnpm --version",
     "upstream:install": "cd deepseek-harness && CI=true corepack pnpm install --frozen-lockfile",
     "upstream:build": "cd deepseek-harness && corepack pnpm run build",

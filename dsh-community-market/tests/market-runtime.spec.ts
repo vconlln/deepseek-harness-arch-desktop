@@ -55,10 +55,10 @@ const renamedAssetRef = 'mktimg_DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD'
 const fixtureAssetRef = 'mktimg_EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE'
 
 const rawPlugin = {
-  id: 'anywhere-labs/deepseek-harness-desktop/dsh-plugin-desktop',
+  id: 'vconlln/deepseek-harness-arch-desktop/dsh-plugin-desktop',
   name: 'deepseek-harness-desktop',
-  owner: 'anywhere-labs',
-  url: 'https://github.com/anywhere-labs/deepseek-harness-desktop',
+  owner: 'vconlln',
+  url: 'https://github.com/vconlln/deepseek-harness-arch-desktop',
   category: 'dev',
   description: { en: 'Desktop shell', zh: '桌面外壳' },
   pushedAt: '2026-08-17T05:45:19Z',
@@ -210,11 +210,11 @@ describe('1024Store adapter', () => {
       id: rawPlugin.id,
       summary: 'Desktop shell',
       repository: {
-        url: 'https://github.com/anywhere-labs/deepseek-harness-desktop',
+        url: 'https://github.com/vconlln/deepseek-harness-arch-desktop',
         subdirectory: 'dsh-plugin-desktop',
       },
       package: { registry: 'npm', name: 'deepseek-harness-desktop' },
-      media: { icon: { assetRef: publisherAssetRef, role: 'publisher-avatar', alt: 'anywhere-labs' } },
+      media: { icon: { assetRef: publisherAssetRef, role: 'publisher-avatar', alt: 'vconlln' } },
       provenance: { sourceRecordId: source().sourceRecordId },
     })
     expect(JSON.stringify(snapshot)).not.toContain('dsh plugin --profile')
@@ -223,9 +223,9 @@ describe('1024Store adapter', () => {
       providerRevision: '2026-08-17T15:49:53.062Z',
     })
     expect(register).toHaveBeenCalledWith({
-      remoteUrl: 'https://github.com/anywhere-labs.png?size=96',
+      remoteUrl: 'https://github.com/vconlln.png?size=96',
       role: 'publisher-avatar',
-      alt: 'anywhere-labs',
+      alt: 'vconlln',
       sourceRecordId: source().sourceRecordId,
       itemId: rawPlugin.id,
       allowedHostnames: ['github.com', 'avatars.githubusercontent.com'],
@@ -437,9 +437,9 @@ describe('1024Store adapter', () => {
   it('uses the v2 page-size ceiling of 100 for discovery', async () => {
     const plugins = Array.from({ length: 101 }, (_, index) => ({
       ...rawPlugin,
-      id: `anywhere-labs/plugin-${index}`,
+      id: `vconlln/plugin-${index}`,
       name: `plugin-${index}`,
-      url: `https://github.com/anywhere-labs/plugin-${index}`,
+      url: `https://github.com/vconlln/plugin-${index}`,
     }))
     const http: CatalogHttpClient = {
       getJson: vi.fn(async (url: string) => ({
@@ -464,9 +464,9 @@ describe('1024Store adapter', () => {
   it('carries the complete v2 category facets through the Host provider result', async () => {
     const uiPlugin = {
       ...rawPlugin,
-      id: 'anywhere-labs/ui-plugin',
+      id: 'vconlln/ui-plugin',
       name: 'ui-plugin',
-      url: 'https://github.com/anywhere-labs/ui-plugin',
+      url: 'https://github.com/vconlln/ui-plugin',
       category: 'ui',
     }
     const plugins = [rawPlugin, uiPlugin]
@@ -1008,9 +1008,9 @@ describe('catalog active-source reads', () => {
     await store.save([first, second])
     const secondItem = {
       ...rawPlugin,
-      id: 'anywhere-labs/second-plugin',
+      id: 'vconlln/second-plugin',
       name: 'second-plugin',
-      url: 'https://github.com/anywhere-labs/second-plugin',
+      url: 'https://github.com/vconlln/second-plugin',
     }
     const getJson = vi.fn(async () => ({
       value: catalogPage([rawPlugin, secondItem]),
@@ -1046,9 +1046,9 @@ describe('catalog active-source reads', () => {
     await store.save([record])
     const secondItem = {
       ...rawPlugin,
-      id: 'anywhere-labs/second-plugin',
+      id: 'vconlln/second-plugin',
       name: 'second-plugin',
-      url: 'https://github.com/anywhere-labs/second-plugin',
+      url: 'https://github.com/vconlln/second-plugin',
     }
     const getJson = vi.fn(async () => ({
       value: catalogPage([rawPlugin, secondItem]),
@@ -1081,9 +1081,9 @@ describe('catalog active-source reads', () => {
     await store.save([first, second])
     const secondItem = {
       ...rawPlugin,
-      id: 'anywhere-labs/second-plugin',
+      id: 'vconlln/second-plugin',
       name: 'second-plugin',
-      url: 'https://github.com/anywhere-labs/second-plugin',
+      url: 'https://github.com/vconlln/second-plugin',
     }
     const getJson = vi.fn(async () => ({
       value: catalogPage([rawPlugin, secondItem]),
@@ -1112,9 +1112,9 @@ describe('catalog active-source reads', () => {
     await store.save([record])
     const secondItem = {
       ...rawPlugin,
-      id: 'anywhere-labs/second-plugin',
+      id: 'vconlln/second-plugin',
       name: 'second-plugin',
-      url: 'https://github.com/anywhere-labs/second-plugin',
+      url: 'https://github.com/vconlln/second-plugin',
     }
     const getJson = vi.fn(async () => ({
       value: catalogPage([rawPlugin, secondItem]),
@@ -1301,9 +1301,9 @@ describe('catalog active-source reads', () => {
     await store.save([source()])
     const secondItem = {
       ...rawPlugin,
-      id: 'anywhere-labs/second-plugin',
+      id: 'vconlln/second-plugin',
       name: 'second-plugin',
-      url: 'https://github.com/anywhere-labs/second-plugin',
+      url: 'https://github.com/vconlln/second-plugin',
     }
     const getJson = vi.fn()
       .mockResolvedValueOnce({
@@ -1409,9 +1409,9 @@ describe('catalog active-source reads', () => {
     await store.save([first])
     const secondItem = {
       ...rawPlugin,
-      id: 'anywhere-labs/second-plugin',
+      id: 'vconlln/second-plugin',
       name: 'second-plugin',
-      url: 'https://github.com/anywhere-labs/second-plugin',
+      url: 'https://github.com/vconlln/second-plugin',
     }
     const completeCatalog = catalogPage([rawPlugin, secondItem])
     const getJson = vi.fn()
