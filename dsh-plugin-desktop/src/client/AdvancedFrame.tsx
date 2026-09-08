@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
+import type {} from '@deepseek-ai/dsh-client-ui-session/client'
 import type { PropsRenderSlots, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type {} from './contracts.ts'
 import type { DesktopClientPlatform } from './environment.ts'
 import {
-  computeDesktopColumns, DesktopLayoutState, MACOS_SIDEBAR_COLLAPSED,
+  collapsedSidebarWidth, computeDesktopColumns, DesktopLayoutState,
   SIDEBAR_AUTO_COLLAPSE, SIDEBAR_COLLAPSED, SIDEBAR_DEFAULT,
 } from './layout-state.ts'
 
-/** Private values assembled by the advanced-shell registration. */
+/** Private values assembled by one Desktop-owned shell registration. */
 export interface AdvancedFrameInjected {
   /** Desktop-owned panel state exposed through the standard layout service. */
   layout: DesktopLayoutState
@@ -15,16 +16,23 @@ export interface AdvancedFrameInjected {
   platform: DesktopClientPlatform
 }
 
-/** Full advanced root slot props. */
+/** Full enhanced-mode root slot props. */
 export type AdvancedFrameProps = PropsRuntime<'root'>
   & PropsRenderSlots<'sidebar' | 'conversation' | 'details' | 'shell.overlay'>
   & AdvancedFrameInjected
 
-/** Desktop-owned transparent frame around the unchanged product surfaces. */
-export function AdvancedFrame({ layout, platform, renderSlot, useSessions }: AdvancedFrameProps) {
+/** Enhanced-mode owner preserving the original Desktop layout contract. */
+export function AdvancedFrame(props: AdvancedFrameProps) {
+  return <DesktopOwnedFrame {...props} mode="advanced" />
+}
+
+/** Shared panel mechanics below the two mode-specific root boundaries. */
+export function DesktopOwnedFrame({ layout, mode, platform, renderSlot, SessionProvider, useSessions }: AdvancedFrameProps & {
+  readonly mode: 'extended' | 'advanced'
+}) {
   const subscribeLayout = useCallback((listener: () => void) => layout.subscribe(listener), [layout])
   const readLayout = useCallback(() => layout.getSnapshot(), [layout])
-  const panels = useSyncExternalStore(subscribeLayout, readLayout)
+  const panels = useSyncExternalStore(subscribeLayout, readLayout, readLayout)
   const frameRef = useRef<HTMLDivElement>(null)
   const [viewport, setViewport] = useState(() => window.innerWidth)
   const detailsSession = useSessions((state) => {
@@ -68,10 +76,10 @@ export function AdvancedFrame({ layout, platform, renderSlot, useSessions }: Adv
     viewport,
     sidebarPreference,
     detailsSession === undefined ? 0 : panels.details,
-    platform === 'darwin' ? MACOS_SIDEBAR_COLLAPSED : SIDEBAR_COLLAPSED,
+    collapsedSidebarWidth(mode, platform),
   )
-  // macOS keeps a wider native rail around the centered upstream sidebar,
-  // while the public owner contract still reports the rendered 56px rail.
+  // Enhanced macOS keeps a wider native rail around the centered upstream
+  // sidebar. Extended mode and other platforms retain the upstream 56px rail.
   const sidebarOwnerWidth = collapsed ? SIDEBAR_COLLAPSED : columns.sidebar
   const columnsRef = useRef(columns)
   columnsRef.current = columns
@@ -99,21 +107,25 @@ export function AdvancedFrame({ layout, platform, renderSlot, useSessions }: Adv
     <div
       ref={frameRef}
       className="dshDesktopFrame"
+      data-desktop-mode={mode}
       data-desktop-platform={platform}
       data-sidebar-collapsed={collapsed || undefined}
       data-details-collapsed={columns.details === 0 || undefined}
       data-dragging={dragging || undefined}
       style={{ gridTemplateColumns: `${columns.sidebar}px minmax(0, 1fr) ${columns.details}px` }}
     >
-      {platform === 'darwin' && <div className="dshDesktopMacCaptionRow" aria-hidden="true" />}
-      {platform === 'win32' && <div className="dshDesktopWindowsCaptionRow" aria-hidden="true" />}
+      {mode === 'advanced' && platform === 'darwin' && <div className="dshDesktopMacCaptionRow" aria-hidden="true" />}
       <aside className="dshDesktopSidebarSurface">
         <div className="dshDesktopUpstreamSidebar">
           {renderSlot('sidebar', { collapsed, width: sidebarOwnerWidth })}
         </div>
       </aside>
       <main className="dshDesktopConversationSurface">{renderSlot('conversation', {})}</main>
-      <aside className="dshDesktopDetailsSurface">{renderSlot('details', {})}</aside>
+      <aside className="dshDesktopDetailsSurface">
+        <SessionProvider>{renderSlot('details', {})}</SessionProvider>
+      </aside>
+      {/* Electron resolves app regions in DOM order; Desktop overlays must remain later. */}
+      {mode === 'advanced' && platform === 'win32' && <div className="dshDesktopWindowsCaptionRow" aria-hidden="true" />}
       <div className="dshDesktopOverlay" data-shell-overlay>
         {renderSlot('shell.overlay', {})}
       </div>

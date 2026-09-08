@@ -6,11 +6,19 @@ import DesktopSettingsController, {
   type DesktopSettingsControllerBootstrap,
 } from '../src/desktop-settings-controller.ts'
 import {
+  handleDesktopDeveloperToolsToggleRequest,
+  handleDesktopDiagnosticsExportRequest,
   handleDesktopMarketSelectRequest,
   handleDesktopProfileCreateRequest,
+  handleDesktopProfileCreateWindowRequest,
+  handleDesktopProfileDeleteRequest,
   handleDesktopProfileSelectRequest,
+  handleDesktopRecoveryRestartRequest,
+  handleDesktopRestartRequest,
+  handleDesktopRendererReloadRequest,
   handleDesktopSettingsRequest,
   handleDesktopTerminalOpenRequest,
+  handleDesktopUpdateCheckRequest,
   desktopSettingsRouteConstants,
 } from '../src/desktop-settings-route.ts'
 import type { DesktopProfileSummary } from '../src/profile-manager.ts'
@@ -58,12 +66,27 @@ function bootstrap(
       current: { name: DESKTOP.name, dir: DESKTOP.dir },
       list: () => [DESKTOP, WORK, BROKEN],
       create: () => WORK,
+      canDelete: () => false,
+      delete: async () => {},
     },
     persistProfileSelection: async () => {},
     readMarket: () => market(),
+    readWeb: () => ({
+      localUrl: 'http://127.0.0.1:43120/',
+      lanUrls: [],
+      lanState: 'inactive',
+      lanError: null,
+      lanCaFingerprint: null,
+      lanCaUrls: [],
+    }),
     selectMarket: async provider => market(provider),
     scheduleRestart: () => {},
+    scheduleRecoveryRestart: () => {},
     openTerminal: () => {},
+    reloadRenderer: () => {},
+    toggleDeveloperTools: () => {},
+    exportDiagnostics: async () => {},
+    openProfileCreator: () => {},
     ...overrides,
   }
 }
@@ -124,11 +147,19 @@ describe('desktop settings controller', () => {
     expect(controller.read()).toEqual({
       current: 'desktop',
       profiles: [
-        { name: 'desktop', exists: true, webCapable: true, selectable: true },
-        { name: 'work', exists: true, webCapable: true, selectable: true },
-        { name: 'broken', exists: true, webCapable: false, selectable: false },
+        { name: 'desktop', exists: true, webCapable: true, selectable: true, deletable: false },
+        { name: 'work', exists: true, webCapable: true, selectable: true, deletable: false },
+        { name: 'broken', exists: true, webCapable: false, selectable: false, deletable: false },
       ],
       market: { requested: 'disabled', effective: 'disabled', legacyDefaulted: false },
+      web: {
+        localUrl: 'http://127.0.0.1:43120/',
+        lanUrls: [],
+        lanState: 'inactive',
+        lanError: null,
+        lanCaFingerprint: null,
+        lanCaUrls: [],
+      },
     })
     expect(JSON.stringify(controller.read())).not.toContain('/private')
     expect(JSON.stringify(controller.read())).not.toContain('private-bundle')
@@ -151,14 +182,53 @@ describe('desktop settings controller', () => {
     expect(controller.createProfile('work')).toEqual({
       current: 'desktop',
       profiles: [
-        { name: 'desktop', exists: true, webCapable: true, selectable: true },
-        { name: 'work', exists: true, webCapable: true, selectable: true },
+        { name: 'desktop', exists: true, webCapable: true, selectable: true, deletable: false },
+        { name: 'work', exists: true, webCapable: true, selectable: true, deletable: false },
       ],
       market: { requested: 'disabled', effective: 'disabled', legacyDefaulted: false },
+      web: {
+        localUrl: 'http://127.0.0.1:43120/',
+        lanUrls: [],
+        lanState: 'inactive',
+        lanError: null,
+        lanCaFingerprint: null,
+        lanCaUrls: [],
+      },
     })
     expect(create).toHaveBeenCalledWith('work')
     expect(persistProfileSelection).not.toHaveBeenCalled()
     expect(scheduleRestart).not.toHaveBeenCalled()
+  })
+
+  it('deletes an eligible profile and returns the fresh projection', async () => {
+    const remove = vi.fn(async () => {})
+    const controller = new DesktopSettingsController(bootstrap({
+      profiles: {
+        current: { name: DESKTOP.name, dir: DESKTOP.dir },
+        list: () => [DESKTOP, WORK],
+        create: () => WORK,
+        canDelete: name => name === WORK.name,
+        delete: remove,
+      },
+    }))
+
+    await expect(controller.deleteProfile('work')).resolves.toEqual({
+      current: 'desktop',
+      profiles: [
+        { name: 'desktop', exists: true, webCapable: true, selectable: true, deletable: false },
+        { name: 'work', exists: true, webCapable: true, selectable: true, deletable: true },
+      ],
+      market: { requested: 'disabled', effective: 'disabled', legacyDefaulted: false },
+      web: {
+        localUrl: 'http://127.0.0.1:43120/',
+        lanUrls: [],
+        lanState: 'inactive',
+        lanError: null,
+        lanCaFingerprint: null,
+        lanCaUrls: [],
+      },
+    })
+    expect(remove).toHaveBeenCalledWith('work')
   })
 
   it('persists a fresh selectable profile and defers restart until after response', async () => {
@@ -241,6 +311,48 @@ describe('desktop settings controller', () => {
     expect(controller.openTerminal()).toEqual({ accepted: true })
     expect(openTerminal).toHaveBeenCalledOnce()
   })
+
+  it('defers an explicit Desktop restart until after its acceptance is returned', () => {
+    const scheduleRestart = vi.fn()
+    const controller = new DesktopSettingsController(bootstrap({ scheduleRestart }))
+
+    const operation = controller.restart()
+    expect(operation.response).toEqual({ accepted: true })
+    expect(scheduleRestart).not.toHaveBeenCalled()
+    operation.afterResponse?.()
+    expect(scheduleRestart).toHaveBeenCalledOnce()
+  })
+
+  it('keeps developer operations behind bounded launcher callbacks', () => {
+    const reloadRenderer = vi.fn()
+    const toggleDeveloperTools = vi.fn()
+    const controller = new DesktopSettingsController(bootstrap({
+      reloadRenderer,
+      toggleDeveloperTools,
+    }))
+
+    const reload = controller.reloadRenderer()
+    expect(reload.response).toEqual({ accepted: true })
+    expect(reloadRenderer).not.toHaveBeenCalled()
+    reload.afterResponse?.()
+    expect(reloadRenderer).toHaveBeenCalledOnce()
+    expect(controller.toggleDeveloperTools()).toEqual({ accepted: true })
+    expect(toggleDeveloperTools).toHaveBeenCalledOnce()
+  })
+
+  it('hands native diagnostics and Profile creation to launcher capabilities', async () => {
+    const exportDiagnostics = vi.fn(async () => {})
+    const openProfileCreator = vi.fn()
+    const controller = new DesktopSettingsController(bootstrap({
+      exportDiagnostics,
+      openProfileCreator,
+    }))
+
+    await expect(controller.exportDiagnostics()).resolves.toEqual({ accepted: true })
+    expect(controller.openProfileCreator()).toEqual({ accepted: true })
+    expect(exportDiagnostics).toHaveBeenCalledOnce()
+    expect(openProfileCreator).toHaveBeenCalledOnce()
+  })
 })
 
 describe('desktop settings HTTP boundary', () => {
@@ -293,12 +405,43 @@ describe('desktop settings HTTP boundary', () => {
     expect(JSON.parse(res.body)).toEqual({
       current: 'desktop',
       profiles: [
-        { name: 'desktop', exists: true, webCapable: true, selectable: true },
-        { name: 'work', exists: true, webCapable: true, selectable: true },
+        { name: 'desktop', exists: true, webCapable: true, selectable: true, deletable: false },
+        { name: 'work', exists: true, webCapable: true, selectable: true, deletable: false },
       ],
       market: { requested: 'disabled', effective: 'disabled', legacyDefaulted: false },
+      web: {
+        localUrl: 'http://127.0.0.1:43120/',
+        lanUrls: [],
+        lanState: 'inactive',
+        lanError: null,
+        lanCaFingerprint: null,
+        lanCaUrls: [],
+      },
     })
     expect(create).toHaveBeenCalledWith('work')
+  })
+
+  it('deletes a profile through the exact mutation endpoint', async () => {
+    const remove = vi.fn(async () => {})
+    const controller = new DesktopSettingsController(bootstrap({
+      profiles: {
+        current: { name: DESKTOP.name, dir: DESKTOP.dir },
+        list: () => [DESKTOP, WORK],
+        create: () => WORK,
+        canDelete: name => name === WORK.name,
+        delete: remove,
+      },
+    }))
+    const res = response()
+
+    await handleDesktopProfileDeleteRequest(jsonRequest({ name: 'work' }), res, ORIGIN, controller)
+
+    expect(res.statusCode).toBe(200)
+    expect(remove).toHaveBeenCalledWith('work')
+    expect(JSON.parse(res.body).profiles).toEqual([
+      { name: 'desktop', exists: true, webCapable: true, selectable: true, deletable: false },
+      { name: 'work', exists: true, webCapable: true, selectable: true, deletable: true },
+    ])
   })
 
   it.each([
@@ -429,6 +572,113 @@ describe('desktop settings HTTP boundary', () => {
       expect(rejected.statusCode).toBe(req.headers.origin === ORIGIN ? 400 : 403)
     }
     expect(openTerminal).toHaveBeenCalledOnce()
+  })
+
+  it('runs the shared interactive update flow only for an exact empty request', async () => {
+    const checkNow = vi.fn(async () => {})
+    const accepted = response()
+
+    await handleDesktopUpdateCheckRequest(jsonRequest({}), accepted, ORIGIN, checkNow)
+
+    expect(accepted.statusCode).toBe(200)
+    expect(JSON.parse(accepted.body)).toEqual({ accepted: true })
+    expect(checkNow).toHaveBeenCalledOnce()
+
+    const rejected = response()
+    await handleDesktopUpdateCheckRequest(
+      jsonRequest({ version: '9.9.9' }), rejected, ORIGIN, checkNow,
+    )
+    expect(rejected.statusCode).toBe(400)
+    expect(checkNow).toHaveBeenCalledOnce()
+  })
+
+  it('queues an explicit restart only after an exact request has been acknowledged', async () => {
+    const scheduleRestart = vi.fn()
+    const controller = new DesktopSettingsController(bootstrap({ scheduleRestart }))
+    const accepted = response()
+
+    await handleDesktopRestartRequest(jsonRequest({}), accepted, ORIGIN, controller)
+
+    expect(accepted.statusCode).toBe(202)
+    expect(JSON.parse(accepted.body)).toEqual({ accepted: true })
+    expect(scheduleRestart).not.toHaveBeenCalled()
+    await new Promise<void>(resolve => { setImmediate(resolve) })
+    expect(scheduleRestart).toHaveBeenCalledOnce()
+
+    const rejected = response()
+    await handleDesktopRestartRequest(jsonRequest({ reason: 'untrusted' }), rejected, ORIGIN, controller)
+    expect(rejected.statusCode).toBe(400)
+    expect(scheduleRestart).toHaveBeenCalledOnce()
+  })
+
+  it('queues recovery restart separately and only after acknowledging an exact request', async () => {
+    const scheduleRecoveryRestart = vi.fn()
+    const controller = new DesktopSettingsController(bootstrap({ scheduleRecoveryRestart }))
+    const accepted = response()
+
+    await handleDesktopRecoveryRestartRequest(jsonRequest({}), accepted, ORIGIN, controller)
+
+    expect(accepted.statusCode).toBe(202)
+    expect(JSON.parse(accepted.body)).toEqual({ accepted: true })
+    expect(scheduleRecoveryRestart).not.toHaveBeenCalled()
+    await new Promise<void>(resolve => { setImmediate(resolve) })
+    expect(scheduleRecoveryRestart).toHaveBeenCalledOnce()
+
+    const rejected = response()
+    await handleDesktopRecoveryRestartRequest(
+      jsonRequest({ mode: 'untrusted' }), rejected, ORIGIN, controller,
+    )
+    expect(rejected.statusCode).toBe(400)
+    expect(scheduleRecoveryRestart).toHaveBeenCalledOnce()
+  })
+
+  it('serves exact developer actions without accepting renderer commands', async () => {
+    const reloadRenderer = vi.fn()
+    const toggleDeveloperTools = vi.fn()
+    const controller = new DesktopSettingsController(bootstrap({
+      reloadRenderer,
+      toggleDeveloperTools,
+    }))
+    const reloadResponse = response()
+    const devToolsResponse = response()
+
+    await handleDesktopRendererReloadRequest(jsonRequest({}), reloadResponse, ORIGIN, controller)
+    await handleDesktopDeveloperToolsToggleRequest(jsonRequest({}), devToolsResponse, ORIGIN, controller)
+
+    expect(reloadResponse.statusCode).toBe(202)
+    expect(devToolsResponse.statusCode).toBe(200)
+    expect(JSON.parse(reloadResponse.body)).toEqual({ accepted: true })
+    expect(JSON.parse(devToolsResponse.body)).toEqual({ accepted: true })
+    expect(reloadRenderer).not.toHaveBeenCalled()
+    expect(toggleDeveloperTools).toHaveBeenCalledOnce()
+    await new Promise<void>(resolve => { setImmediate(resolve) })
+    expect(reloadRenderer).toHaveBeenCalledOnce()
+
+    const rejected = response()
+    await handleDesktopDeveloperToolsToggleRequest(
+      jsonRequest({ code: 'require("electron")' }), rejected, ORIGIN, controller,
+    )
+    expect(rejected.statusCode).toBe(400)
+    expect(toggleDeveloperTools).toHaveBeenCalledOnce()
+  })
+
+  it('exports diagnostics and opens the native creator', async () => {
+    const exportDiagnostics = vi.fn(async () => {})
+    const openProfileCreator = vi.fn()
+    const controller = new DesktopSettingsController(bootstrap({
+      exportDiagnostics,
+      openProfileCreator,
+    }))
+    const diagnosticResponse = response()
+    const creatorResponse = response()
+
+    await handleDesktopDiagnosticsExportRequest(jsonRequest({}), diagnosticResponse, ORIGIN, controller)
+    await handleDesktopProfileCreateWindowRequest(jsonRequest({}), creatorResponse, ORIGIN, controller)
+
+    expect(diagnosticResponse.statusCode).toBe(200)
+    expect(creatorResponse.statusCode).toBe(200)
+    expect(exportDiagnostics).toHaveBeenCalledOnce()
+    expect(openProfileCreator).toHaveBeenCalledOnce()
   })
 
   it('reports terminal launch failures without exposing the native cause', async () => {

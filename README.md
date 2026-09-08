@@ -7,6 +7,7 @@ DeepSeek Harness 的桌面客户端,Arch Linux 适配。Electron 壳内嵌官方
 - Arch Linux x86_64
 - Node.js >= 22.19
 - git
+- corepack(Node.js 25 起不再随包分发,缺失时执行 `npm i -g corepack`)
 
 ## 构建
 
@@ -21,8 +22,8 @@ corepack yarn dist:linux
 产物:
 
 ```text
-dsh-plugin-desktop/dist/DSH-Desktop-2.0.2-x64.pacman
-dsh-plugin-desktop/dist/DSH-Desktop-2.0.2-x64.AppImage
+dsh-plugin-desktop/dist/DSH-Desktop-2.0.5-x64.pacman
+dsh-plugin-desktop/dist/DSH-Desktop-2.0.5-x64.AppImage
 ```
 
 `dist:linux` 先跑 `check:linux-package` 门禁(构建、类型检查、打包相关测试、运行时闭包校验),再由 electron-builder 出包,最后经 `scripts/verify-linux-package.ts` 校验产物结构。
@@ -30,7 +31,7 @@ dsh-plugin-desktop/dist/DSH-Desktop-2.0.2-x64.AppImage
 ## 安装
 
 ```sh
-sudo pacman -U dsh-plugin-desktop/dist/DSH-Desktop-2.0.2-x64.pacman
+sudo pacman -U dsh-plugin-desktop/dist/DSH-Desktop-2.0.5-x64.pacman
 ```
 
 包名 `dsh-plugin-desktop`,卸载:
@@ -44,7 +45,7 @@ sudo pacman -R dsh-plugin-desktop
 不安装、直接运行:
 
 ```sh
-./DSH-Desktop-2.0.2-x64.AppImage --appimage-extract-and-run
+./DSH-Desktop-2.0.5-x64.AppImage --appimage-extract-and-run
 ```
 
 装有 `fuse2` 时可直接执行,否则用上面的 extract-and-run 方式。
@@ -58,8 +59,8 @@ sudo pacman -R dsh-plugin-desktop
 
 GitHub Releases 目前为空。发布一次之后,Releases 下载与 AUR 安装才可用:
 
-1. 仓库页面创建 Release,tag `v2.0.2`,上传上面两个产物;
-2. 更新 `dsh-plugin-desktop/aur/PKGBUILD`:`_owner` 改为 `vconlln`,用 `sha256sum` 的结果替换 `sha256sums=('SKIP')`;
+1. 仓库页面创建 Release,tag `v2.0.5`,上传上面两个产物;
+2. 用 `sha256sum` 计算两个产物的哈希,替换 `dsh-plugin-desktop/aur/PKGBUILD` 里的 `sha256sums=('SKIP')`;
 3. 之后即可 `yay -S deepseek-harness-desktop-bin`。
 
 ## 测试
@@ -77,6 +78,7 @@ dsh-plugin-desktop/   桌面端主体与打包脚本
   scripts/package-linux.ts        出包入口
   scripts/verify-linux-package.ts 产物校验
   aur/                            PKGBUILD 与 desktop 参考
+dsh-plugin-desktop-beta/  beta 通道的桌面端变体(与 stable 共享源码)
 dsh-community-market/  插件市场(随桌面端打包)
 dsh-plugin-wallpaper/  自有维护的壁纸插件(亚克力背景 + 壁纸设计面板)
 dsh-community-fabric/  社区互操作规范

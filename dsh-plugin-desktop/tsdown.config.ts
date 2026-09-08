@@ -8,6 +8,7 @@ export default defineConfig([
     entry: {
       index: 'src/index.ts',
       'module-resolution': 'src/module-resolution.ts',
+      webserver: 'src/webserver.ts',
       profile: 'src/profile.ts',
       'profile-manager': 'src/profile-manager.ts',
       'profile-service': 'src/profile-service.ts',
@@ -26,7 +27,6 @@ export default defineConfig([
       'update-checker': 'src/update-checker.ts',
       'update-download': 'src/update-download.ts',
       updates: 'src/updates.ts',
-      'windows-agent-presets': 'src/windows-agent-presets.ts',
       'windows-pwsh-sandbox': 'src/windows-pwsh-sandbox.ts',
       'windows-acl-runner': 'src/windows-acl-runner.ts',
       main: 'src/main.ts',
@@ -63,6 +63,9 @@ export default defineConfig([
     format: 'cjs',
     platform: 'browser',
     target: 'es2022',
+    define: {
+      'process.env.NODE_ENV': JSON.stringify('production'),
+    },
     fixedExtension: false,
     dts: false,
     clean: false,
@@ -73,7 +76,6 @@ export default defineConfig([
       'react-dom',
       'react-dom/client',
       '@deepseek-ai/cordis',
-      '@deepseek-ai/dsh-client-runtime/client',
       '@deepseek-ai/dsh-client-ui-slots',
       '@deepseek-ai/dsh-client-ui-renderer',
       '@deepseek-ai/dsh-client-ui-primitives',

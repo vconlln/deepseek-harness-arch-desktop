@@ -14,6 +14,7 @@
 | --- | --- |
 | [用户指南](user-guide.md) | 安装、profile、模式、终端、插件命令和更新 |
 | [常见问题](faq.md) | 支持平台、内置环境、官方边界、数据、插件和更新的直接回答 |
+| [隐私政策](../PRIVACY.zh.md) | 官方更新、下载、本地数据、第三方服务与用户选择 |
 | [为什么做 Desktop](why-desktop.md) | Desktop 与官方 Harness 的边界，以及为什么坚持插件化 |
 
 ### 开发者与维护者文档
@@ -28,13 +29,13 @@
 | [VS Code 扩展模型调研](../dsh-community-fabric/docs/research/vscode-extension-model.zh.md) | VS Code 已实现的声明、Provider、UI、运行位置和生命周期模式，以及它们对 Fabric RFC 的具体约束 |
 | [Community Market 设计](../dsh-community-market/README.zh.md) | 规划中的插件市场壳、可扩展目录来源、用户选择、安装确认和安全边界 |
 | [Market 目录提供方合同](../dsh-community-market/docs/catalog-provider-contract.zh.md) | 面向后续实现团队的 Schema、query 参数、多来源和适配器规范 |
-| [架构说明](architecture.md) | Electron、Host、loopback Web、profile 和打包之间的关系 |
+| [架构说明](architecture.md) | Electron、Host、Web carrier、profile 和打包之间的关系 |
 | [Desktop service 参考](../dsh-plugin-desktop/docs/plugin-services.md) | `desktopProfiles`、`desktopPnpm` 的稳定 contract 和 TypeScript 示例 |
 | [包级参考](../dsh-plugin-desktop/README.md) | 完整的构建、运行、发布和已知限制 |
 
 ## README 文件怎么分工
 
-目前外层仓库有两份正式的产品 README，另保留一个旧链接兼容入口：
+本仓库只有一个根 README：
 
 - [`README.md`](../README.md)：Arch Linux 适配版产品入口（中文），也是本仓库唯一的根 README。
 - 原 `README.en.md` / `README.zh.md` / `README.i18n.yaml` 已随 Arch 适配分支移除，根级双语对不再维护。`dsh-plugin-desktop/README.md` 和 `dsh-plugin-desktop/README.zh.md` 是 npm 包随包发布的包级参考；它们比根 README 更技术化。`dsh-plugin-desktop/docs/` 是稳定 API 合同，不是营销页。`.agents/notes/implemented/` 是日期化的维护者决策记录，适合追溯取舍，不替代用户文档。
@@ -43,4 +44,4 @@
 
 ## 状态约定
 
-文档会明确区分已实现能力、平台限制和 roadmap。Desktop 的兼容模式保留上游默认 Web 客户端；高级模式才安装 Desktop 自有的布局和原生材质。插件市场已建立 [`dsh-community-market`](../dsh-community-market/README.zh.md) 文档初始化工程，但尚无可用页面或安装器；手机远程和 Channels 也仍是独立 roadmap，不代表当前安装包已经提供这些产品入口。
+文档会明确区分已实现能力、平台限制和 roadmap。Desktop 的兼容模式在独立 Desktop frame 下保留上游默认 Web 客户端；扩展窗口安装自己独立注册的 Desktop layout/sidebar surface，并在倒 L 中承载官方 occupant；增强模式保留独立 root registration 与紧凑内部 caption。Desktop frame 会按系统能力提供原生材质。插件市场已建立 [`dsh-community-market`](../dsh-community-market/README.zh.md) 文档初始化工程，但尚无可用页面或安装器；手机远程和 Channels 也仍是独立 roadmap，不代表当前安装包已经提供这些产品入口。
