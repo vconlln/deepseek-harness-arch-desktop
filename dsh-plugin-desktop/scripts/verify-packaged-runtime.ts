@@ -105,6 +105,10 @@ export const REQUIRED_UNPACKED_RUNTIME_ENTRIES = [
   'node_modules/@deepseek-ai/dsh-web-frontend/dist/index.html',
   'node_modules/open/index.js',
   'node_modules/pnpm/bin/pnpm.mjs',
+  // fs-ext is compiled for the packaged Electron ABI by scripts/prepare-native-addons.mjs.
+  // @deepseek-ai/dsh-session-persistence-jsonl imports it at module scope for session
+  // locking, so an app without this binding cannot boot at all.
+  'node_modules/fs-ext/build/Release/fs_ext.node',
 ] as const
 
 /** Prebuilt Node-API modules required when the Windows package skips native source rebuilds. */
