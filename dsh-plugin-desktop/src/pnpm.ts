@@ -216,6 +216,7 @@ class DesktopPnpmService extends Service implements DesktopPnpm {
         NODE: this.bootstrap.nodeShimPath,
         ELECTRON_RUN_AS_NODE: '1',
         DSH_HOME: this.bootstrap.homeDir,
+        DSH_DESKTOP_PROFILE_OWNER: '1',
         CI: 'true',
         npm_config_runtime: 'electron',
         npm_config_target: this.bootstrap.electronVersion,

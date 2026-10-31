@@ -44,7 +44,7 @@ dist/deepseek-harness-0.1.3-alpha.2-linux-x86_64.AppImage
 corepack yarn dist:arch
 ```
 
-产物：`dsh-plugin-desktop/dist/DSH-Desktop-2.0.5-x64.pacman`。这条路径依赖 `vendor/dsh-runtime/` 里随仓库提交的运行时 tarball。
+产物：`dsh-plugin-desktop/dist/DSH-Desktop-2.1.0-x64.pacman`。这条路径依赖 `vendor/dsh-runtime/` 里随仓库提交的运行时 tarball。
 
 ## 安装
 
@@ -53,7 +53,7 @@ corepack yarn dist:arch
 sudo pacman -U dist/deepseek-harness-0.1.3-alpha.2-linux-x64.pacman
 
 # Legacy
-sudo pacman -U dsh-plugin-desktop/dist/DSH-Desktop-2.0.5-x64.pacman
+sudo pacman -U dsh-plugin-desktop/dist/DSH-Desktop-2.1.0-x64.pacman
 ```
 
 上游 Desktop：包名 `deepseek-harness`，装在 `/opt/DeepSeek Harness/`，可执行名 `dsh-desktop`，桌面项 `usr/share/applications/deepseek-harness.desktop`。Legacy：包名 `dsh-plugin-desktop`，装在 `/opt/DSH Desktop/`。

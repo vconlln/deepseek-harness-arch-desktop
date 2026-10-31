@@ -21,9 +21,9 @@ import {
   writeProfileManifest,
   type Profile,
   type ProfileManifest,
-  type ProfilePatchReload,
 } from '@deepseek-ai/dsh-app-boot'
 import { resolveDshHome } from '@deepseek-ai/dsh-home-paths'
+import type { ProfilePatchReload } from '@deepseek-ai/dsh-package-manifest'
 import FileSettingsProvider, {
   resolveSpec as resolveSettingsFileSpec,
   type Config as SettingsFileConfig,

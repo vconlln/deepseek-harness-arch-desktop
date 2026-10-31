@@ -68,7 +68,7 @@ const workspaceManifest = JSON.parse(readFileSync(new URL('package.json', worksp
 }
 const ciWorkflow = readFileSync(new URL('.github/workflows/ci.yml', workspaceRoot), 'utf8')
 const main = readFileSync(new URL('src/main.ts', packageRoot), 'utf8')
-const runtimeVersion = '0.1.2-rc.1'
+const runtimeVersion = '0.1.3-alpha.2'
 const dshResolution = (name: string): unknown =>
   workspaceManifest.resolutions?.[`${name}@npm:${runtimeVersion}`]
 
@@ -190,7 +190,7 @@ describe('published package surface', () => {
   })
 
   it('patches the browse panel with the Windows native-picker icon bridge', () => {
-    const patchPath = './patches/dsh-client-ui-directory-picker-browse@0.1.2-rc.1.patch'
+    const patchPath = './patches/dsh-client-ui-directory-picker-browse@0.1.3-alpha.2.patch'
     expect(dshResolution('@deepseek-ai/dsh-client-ui-directory-picker-browse'))
       .toContain(patchPath)
     const patch = readFileSync(new URL(patchPath, workspaceRoot), 'utf8')
@@ -214,7 +214,7 @@ describe('published package surface', () => {
   })
 
   it('patches the browse backend to skip unreadable directory-looking entries', () => {
-    const patchPath = './patches/dsh-host-directory-picker-browse@0.1.2-rc.1.patch'
+    const patchPath = './patches/dsh-host-directory-picker-browse@0.1.3-alpha.2.patch'
     expect(dshResolution('@deepseek-ai/dsh-host-directory-picker-browse'))
       .toContain(patchPath)
     const patch = readFileSync(new URL(patchPath, workspaceRoot), 'utf8')
@@ -233,7 +233,7 @@ describe('published package surface', () => {
   })
 
   it('gives the Desktop settings section a dedicated display icon', () => {
-    const patchPath = './patches/dsh-client-ui-settings-general@0.1.2-rc.1.patch'
+    const patchPath = './patches/dsh-client-ui-settings-general@0.1.3-alpha.2.patch'
     expect(dshResolution('@deepseek-ai/dsh-client-ui-settings-general'))
       .toContain(patchPath)
     const patch = readFileSync(new URL(patchPath, workspaceRoot), 'utf8')
@@ -257,13 +257,13 @@ describe('published package surface', () => {
 
     expect(dshResolutions.length).toBeGreaterThan(0)
     for (const [selector, resolution] of dshResolutions) {
-      expect(selector).toMatch(/@npm:\^?0\.1\.2-rc\.1$/u)
-      expect(String(resolution)).toContain('0.1.2-rc.1')
+      expect(selector).toMatch(/@npm:\^?0\.1\.3-alpha\.2$/u)
+      expect(String(resolution)).toContain('0.1.3-alpha.2')
     }
   })
 
   it('keeps the canonical web profile configurable while Desktop disables browser opening', () => {
-    const patchPath = './patches/dsh-web-app@0.1.2-rc.1.patch'
+    const patchPath = './patches/dsh-web-app@0.1.3-alpha.2.patch'
     const openPatchPath = './patches/open@11.0.1.patch'
     const openPatchResolution = `patch:open@npm%3A11.0.1#${openPatchPath}`
     expect(dshResolution('@deepseek-ai/dsh-web-app')).toContain(patchPath)
@@ -694,7 +694,7 @@ describe('published package surface', () => {
 
   it('fixes the installed application identity', () => {
     expect(workspaceManifest.version).toBeUndefined()
-    expect(manifest.version).toBe('2.0.5')
+    expect(manifest.version).toBe('2.1.0')
     expect(manifest.build?.productName).toBe('DSH Desktop')
     expect(manifest.build?.appId).toBe('ai.deepseek.dsh.desktop')
     expect(manifest.build?.asarUnpack).toEqual([
@@ -969,8 +969,8 @@ describe('published package surface', () => {
   })
 
   it('hides official plugin-manager and general subprocess consoles on Windows', () => {
-    const dshPatchPath = './patches/dsh@0.1.2-rc.1.patch'
-    const subprocessPatchPath = './patches/dsh-subprocess-local@0.1.2-rc.1.patch'
+    const dshPatchPath = './patches/dsh@0.1.3-alpha.2.patch'
+    const subprocessPatchPath = './patches/dsh-subprocess-local@0.1.3-alpha.2.patch'
     const lockfile = readFileSync(new URL('yarn.lock', workspaceRoot), 'utf8')
     const dshPatch = readFileSync(new URL(dshPatchPath, workspaceRoot), 'utf8')
     const subprocessPatch = readFileSync(new URL(subprocessPatchPath, workspaceRoot), 'utf8')
@@ -989,8 +989,11 @@ describe('published package surface', () => {
     expect(lockfile).toContain(subprocessPatchPath)
     expect(dshPatch).toContain('+\t\twindowsHide: true')
     expect(dshPluginRuntime).toMatch(/spawnSync\("pnpm"[\s\S]*?shell: process\.platform === "win32",\s+windowsHide: true/u)
-    expect(subprocessPatch.match(/^\+\s*windowsHide: true\r?$/gmu)).toHaveLength(3)
-    expect(subprocessRuntime.match(/windowsHide: true/gu)).toHaveLength(3)
+    // The previous runtime launched `taskkill` twice and the child once. The current
+    // runtime contains process trees with Win32 Job objects instead, so the only
+    // console-launching site left to hide is the Job runner itself.
+    expect(subprocessPatch.match(/^\+\s*windowsHide: true\r?$/gmu)).toHaveLength(1)
+    expect(subprocessRuntime.match(/windowsHide: true/gu)).toHaveLength(1)
   })
 
   it('resolves electron-builder through the pinned app-builder-lib keychain patch', () => {
@@ -1053,9 +1056,9 @@ describe('published package surface', () => {
   })
 
   it('starts restricted Windows shells with a hidden console show state', () => {
-    const patchPath = './patches/dsh-win32-process@0.1.2-rc.1.patch'
+    const patchPath = './patches/dsh-win32-process@0.1.3-alpha.2.patch'
     const lockfile = readFileSync(new URL('yarn.lock', workspaceRoot), 'utf8')
-    const patch = readFileSync(new URL('patches/dsh-win32-process@0.1.2-rc.1.patch', workspaceRoot), 'utf8')
+    const patch = readFileSync(new URL('patches/dsh-win32-process@0.1.3-alpha.2.patch', workspaceRoot), 'utf8')
     const workspaceRequire = createRequire(new URL('package.json', packageRoot))
     const sandboxManifest = workspaceRequire.resolve('@deepseek-ai/dsh-sandbox-windows-acl/package.json')
     const sandboxRequire = createRequire(sandboxManifest)
@@ -1069,6 +1072,8 @@ describe('published package surface', () => {
     expect(installedRuntime.match(/dwFlags: 257,/gu)).toHaveLength(2)
     expect(installedRuntime.match(/wShowWindow: 0,/gu)).toHaveLength(2)
     expect(installedRuntime).toContain('createRestrictedProcess(api, options, buildCommandLine(options.command, options.args), 0')
-    expect(installedRuntime).toContain('createRestrictedProcess(api, options, buildCommandLine(options.command, options.args), 4')
+    // The Job-owned launch forwards an already-rendered command line, so the
+    // second restricted spawn no longer rebuilds it inline.
+    expect(installedRuntime).toContain('createRestrictedProcess(api, options, commandLine, 4')
   })
 })

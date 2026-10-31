@@ -26,7 +26,6 @@ function child(): ControlledSubprocess {
   const outcome = deferred<SubprocessOutcome>()
   const tree = deferred<boolean>()
   return {
-    pid: 43120,
     stdin: undefined,
     stdout: new PassThrough(),
     stderr: new PassThrough(),
@@ -122,6 +121,7 @@ describe('desktop pnpm execution service', () => {
         PATH: `${bootstrap().nodeBinDir}${delimiter}${globalThis.process.env.PATH ?? ''}`,
         NODE: bootstrap().nodeShimPath,
         ELECTRON_RUN_AS_NODE: '1',
+        DSH_DESKTOP_PROFILE_OWNER: '1',
         DSH_HOME: bootstrap().homeDir,
         CI: 'true',
         npm_config_runtime: 'electron',

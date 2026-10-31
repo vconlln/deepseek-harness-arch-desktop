@@ -1,0 +1,29 @@
+diff --git a/lib/bin.js b/lib/bin.js
+index e6d3eef..1e615ca 100755
+--- a/lib/bin.js
++++ b/lib/bin.js
+@@ -26,7 +26,9 @@ import { Command, CommanderError } from "commander";
+ */
+ const collect = (value, previous = []) => [...previous, value];
+ function rejectElectronProfile(program, profile) {
+-	if (profile.toLowerCase() === "desktop") program.error("error: profile \"desktop\" is managed exclusively by the Electron application");
++	// A Desktop build this repository ships owns that profile and drives plugin
++	// operations through this CLI, so it marks itself as the owner.
++	if (process.env.DSH_DESKTOP_PROFILE_OWNER !== "1" && profile.toLowerCase() === "desktop") program.error("error: profile \"desktop\" is managed exclusively by the Electron application");
+ }
+ /** The launcher's own help text; each app prints its own. */
+ const HELP_EXAMPLES = `
+diff --git a/lib/plugin-WDISvmGc.js b/lib/plugin-WDISvmGc.js
+index ffed745..f09fe18 100644
+--- a/lib/plugin-WDISvmGc.js
++++ b/lib/plugin-WDISvmGc.js
+@@ -109,7 +109,8 @@ function runPlugin(profile, args) {
+ 	const result = spawnSync("pnpm", args.map((argument) => anchorPathSpec(argument, process.cwd())), {
+ 		cwd: dir,
+ 		stdio: "inherit",
+-		shell: process.platform === "win32"
++		shell: process.platform === "win32",
++		windowsHide: true
+ 	});
+ 	if (result.error !== void 0) {
+ 		if (result.error.code === "ENOENT") {

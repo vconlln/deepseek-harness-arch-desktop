@@ -86,6 +86,7 @@ export function recoveryPluginEnvironment(
   environment.NODE = options.nodeShimPath
   environment.ELECTRON_RUN_AS_NODE = '1'
   environment.DSH_HOME = options.homeDir
+  environment.DSH_DESKTOP_PROFILE_OWNER = '1'
   environment.CI = 'true'
   environment.npm_config_runtime = 'electron'
   environment.npm_config_target = options.electronVersion
