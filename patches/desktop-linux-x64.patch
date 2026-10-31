@@ -198,3 +198,19 @@ index 1f32123ec0..1b691ef23f 100644
    if (name === 'mac-arm64' && hostArch !== 'arm64') {
      throw new Error('desktop package: mac-arm64 requires an Apple Silicon build host')
    }
+diff --git a/apps/desktop/src/paths.ts b/apps/desktop/src/paths.ts
+index 4f883929db..2be07a4072 100644
+--- a/apps/desktop/src/paths.ts
++++ b/apps/desktop/src/paths.ts
+@@ -31,7 +31,10 @@ export function resolveDesktopPaths(dshHome: string = resolveDshHome()): Desktop
+   const pnpm = join(root, 'pnpm')
+   return {
+     root,
+-    profile: join(dshHome, 'profiles', 'desktop'),
++    // Upstream owns a profile of its own: the legacy Cordis shell in this
++    // repository already occupies $DSH_HOME/profiles/desktop, and reusing it
++    // makes the desktop reject the foreign manifest at startup.
++    profile: join(dshHome, 'profiles', 'desktop-upstream'),
+     staging: join(root, 'staging'),
+     rollback: join(root, 'rollback', 'profile'),
+     pending: join(root, 'pending.json'),
