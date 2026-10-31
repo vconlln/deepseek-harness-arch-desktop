@@ -1,6 +1,6 @@
 # DSH Desktop repository rules
 
-This repository owns the desktop product around an unmodified DeepSeek Harness checkout.
+This repository owns the desktop product around a DeepSeek Harness checkout that stays unmodified except for the single documented build-time patch described below.
 
 ## Prerequisites and setup
 
@@ -18,7 +18,9 @@ This repository owns the desktop product around an unmodified DeepSeek Harness c
 - Run upstream operations through the root scripts, such as `corepack yarn upstream:build`.
 
 - `deepseek-harness/` is a pinned upstream Git submodule. Never edit files inside it from a desktop feature branch.
-- `dsh-plugin-desktop/` owns the Cordis Host and Client faces, Electron bootstrap, packaging, and release tests.
+- **Narrow exception — the Linux release target.** Upstream `apps/desktop` registers only `mac-arm64`, `mac-x64`, and `win-x64` release targets, so producing an Arch artifact requires teaching that pipeline `linux-x64`. `patches/desktop-linux-x64.patch` carries exactly that change and nothing else. `scripts/build-desktop-linux.mjs` applies it inside the submodule for the duration of one packaging run and reverts it before returning, so the checkout is clean again afterwards and `corepack yarn check:layout` keeps enforcing that. Never commit a gitlink whose submodule carries the patch.
+- `scripts/build-desktop-linux.mjs` and `aur/deepseek-harness-desktop/` own the first-party Desktop Arch packaging path, built from upstream `apps/desktop`.
+- `dsh-plugin-desktop/` owns the Cordis Host and Client faces, Electron bootstrap, packaging, and release tests. It is the **legacy** shell and is documented as such; it is not the upstream Desktop.
 - `dsh-community-fabric/` owns the community interoperability RFC. Until schemas and a reviewed reference adapter exist, it remains a private documentation scaffold and must not declare loadable DSH or package entry points.
 - `dsh-community-market/` owns the community-market shell. Until its runtime is implemented, it remains a private documentation scaffold and must not declare loadable DSH or package entry points.
 - The outer repository and all owned packages use the root Yarn release with `nodeLinker: node-modules`.

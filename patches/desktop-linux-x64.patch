@@ -1,0 +1,200 @@
+diff --git a/apps/desktop/electron-builder.config.mjs b/apps/desktop/electron-builder.config.mjs
+index c47bd6d7a9..7e1a349600 100644
+--- a/apps/desktop/electron-builder.config.mjs
++++ b/apps/desktop/electron-builder.config.mjs
+@@ -95,7 +95,25 @@ export function createElectronBuilderConfig(
+     },
+     linux: {
+       category: 'Development',
+-      target: ['AppImage'],
++      target: ['AppImage', 'pacman'],
++      executableName: 'dsh-desktop',
++      syncDesktopName: true,
++      maintainer: 'vconlln <vconlln@users.noreply.github.com>',
++      vendor: 'DeepSeek AI',
++      synopsis: 'DeepSeek Harness desktop',
++      description: 'DeepSeek Harness desktop: Electron shell for the dsh runtime',
++      icon: 'build/app-icon.png',
++      desktop: {
++        entry: {
++          Name: 'DeepSeek Harness',
++          Comment: 'DeepSeek Harness desktop',
++          StartupWMClass: 'deepseek-harness',
++          Categories: 'Development;',
++        },
++      },
++    },
++    pacman: {
++      packageName: 'deepseek-harness',
+     },
+     nsis: {
+       oneClick: false,
+diff --git a/apps/desktop/package.json b/apps/desktop/package.json
+index ec0b802a17..749b47f2cd 100644
+--- a/apps/desktop/package.json
++++ b/apps/desktop/package.json
+@@ -4,6 +4,8 @@
+   "version": "0.1.3-alpha.2",
+   "private": true,
+   "license": "MIT",
++  "homepage": "https://github.com/vconlln/deepseek-harness-arch-desktop",
++  "desktopName": "deepseek-harness",
+   "type": "module",
+   "main": "lib/main.js",
+   "scripts": {
+diff --git a/apps/desktop/scripts/desktop-auto-update-environment.d.mts b/apps/desktop/scripts/desktop-auto-update-environment.d.mts
+index b1661646e5..072a7137f2 100644
+--- a/apps/desktop/scripts/desktop-auto-update-environment.d.mts
++++ b/apps/desktop/scripts/desktop-auto-update-environment.d.mts
+@@ -5,7 +5,7 @@ export const DESKTOP_AUTO_UPDATE_ENV: 'DSH_DESKTOP_AUTO_UPDATE_ENV'
+ export type DesktopAutoUpdateEnvironment = 'test' | 'production'
+ 
+ /** Directory name of one supported Desktop release target. */
+-export type DesktopAutoUpdateTarget = 'mac-arm64' | 'mac-x64' | 'win-x64'
++export type DesktopAutoUpdateTarget = 'mac-arm64' | 'mac-x64' | 'win-x64' | 'linux-x64'
+ 
+ /** Public updater URL for one release target. */
+ export interface DesktopAutoUpdateConfig {
+diff --git a/apps/desktop/scripts/desktop-auto-update-environment.mjs b/apps/desktop/scripts/desktop-auto-update-environment.mjs
+index da3c36ccb5..b62136a0f7 100644
+--- a/apps/desktop/scripts/desktop-auto-update-environment.mjs
++++ b/apps/desktop/scripts/desktop-auto-update-environment.mjs
+@@ -22,7 +22,7 @@ const UPDATE_ENVIRONMENTS = {
+   },
+ }
+ 
+-const UPDATE_TARGETS = new Set(['mac-arm64', 'mac-x64', 'win-x64'])
++const UPDATE_TARGETS = new Set(['mac-arm64', 'mac-x64', 'win-x64', 'linux-x64'])
+ 
+ /**
+  * Resolve the update deployment, defaulting local release work to test.
+@@ -41,7 +41,7 @@ export function resolveDesktopAutoUpdateEnvironment(env) {
+  * Resolve one supported platform and architecture to its update directory.
+  * @param {NodeJS.Platform} platform - Target Node.js platform.
+  * @param {string} arch - Target Node.js architecture.
+- * @returns {'mac-arm64' | 'mac-x64' | 'win-x64'} Update target directory.
++ * @returns {'mac-arm64' | 'mac-x64' | 'win-x64' | 'linux-x64'} Update target directory.
+  */
+ export function resolveDesktopAutoUpdateTarget(platform, arch) {
+   const os = platform === 'darwin' ? 'mac' : platform === 'win32' ? 'win' : platform
+@@ -54,7 +54,7 @@ export function resolveDesktopAutoUpdateTarget(platform, arch) {
+ 
+ /**
+  * Return the local completion record filename for one packaged target.
+- * @param {'mac-arm64' | 'mac-x64' | 'win-x64'} target - Supported release target.
++ * @param {'mac-arm64' | 'mac-x64' | 'win-x64' | 'linux-x64'} target - Supported release target.
+  * @returns {string} Filename stored beside electron-builder artifacts.
+  */
+ export function desktopBuildRecordFilename(target) {
+@@ -126,7 +126,7 @@ function httpsOrigin(value, name) {
+  * @param {NodeJS.ProcessEnv} env - Packaging or upload environment.
+  * @param {NodeJS.Platform} platform - Target Node.js platform.
+  * @param {string} arch - Target Node.js architecture.
+- * @returns {{ environment: 'test' | 'production', target: 'mac-arm64' | 'mac-x64' | 'win-x64', origin: string, publicUrl: string, keyPrefix: string }} Resolved updater configuration.
++ * @returns {{ environment: 'test' | 'production', target: 'mac-arm64' | 'mac-x64' | 'win-x64' | 'linux-x64', origin: string, publicUrl: string, keyPrefix: string }} Resolved updater configuration.
+  * @throws {Error} When the test deployment lacks a valid HTTPS origin.
+  */
+ export function resolveDesktopAutoUpdateConfig(env, platform, arch) {
+@@ -154,7 +154,7 @@ export function resolveDesktopAutoUpdateConfig(env, platform, arch) {
+  * @param {NodeJS.ProcessEnv} env - Upload environment.
+  * @param {NodeJS.Platform} platform - Target Node.js platform.
+  * @param {string} arch - Target Node.js architecture.
+- * @returns {{ environment: 'test' | 'production', target: 'mac-arm64' | 'mac-x64' | 'win-x64', origin: string, publicUrl: string, keyPrefix: string, bucket: string, secretIdEnvName: string, secretKeyEnvName: string }} Resolved upload configuration.
++ * @returns {{ environment: 'test' | 'production', target: 'mac-arm64' | 'mac-x64' | 'win-x64' | 'linux-x64', origin: string, publicUrl: string, keyPrefix: string, bucket: string, secretIdEnvName: string, secretKeyEnvName: string }} Resolved upload configuration.
+  * @throws {Error} When the selected deployment lacks a required origin or bucket, or the test origin is not HTTPS.
+  */
+ export function resolveDesktopUploadConfig(env, platform, arch) {
+diff --git a/apps/desktop/scripts/desktop-build-paths.mjs b/apps/desktop/scripts/desktop-build-paths.mjs
+index 504136e1db..d6f5c4bbf6 100644
+--- a/apps/desktop/scripts/desktop-build-paths.mjs
++++ b/apps/desktop/scripts/desktop-build-paths.mjs
+@@ -4,14 +4,14 @@ import { join, resolve } from 'node:path'
+ 
+ const APP_ROOT = resolve(import.meta.dirname, '..')
+ const BUILD_ROOT = join(APP_ROOT, '.desktop-build')
+-const SUPPORTED_TARGETS = new Set(['mac-arm64', 'mac-x64', 'win-x64'])
++const SUPPORTED_TARGETS = new Set(['mac-arm64', 'mac-x64', 'win-x64', 'linux-x64'])
+ 
+ /**
+  * Resolve the fixed build target selected by a packaging environment.
+  * @param {NodeJS.ProcessEnv} env - Packaging environment.
+  * @param {NodeJS.Platform} hostPlatform - Build-host platform used when no target override exists.
+  * @param {string} hostArch - Build-host architecture used when no target override exists.
+- * @returns {'mac-arm64' | 'mac-x64' | 'win-x64'} Supported Desktop target name.
++ * @returns {'mac-arm64' | 'mac-x64' | 'win-x64' | 'linux-x64'} Supported Desktop target name.
+  */
+ export function resolveDesktopBuildTarget(
+   env = process.env,
+@@ -25,12 +25,12 @@ export function resolveDesktopBuildTarget(
+   if (!SUPPORTED_TARGETS.has(target)) {
+     throw new Error(`desktop build paths: unsupported target ${target}`)
+   }
+-  return /** @type {'mac-arm64' | 'mac-x64' | 'win-x64'} */ (target)
++  return /** @type {'mac-arm64' | 'mac-x64' | 'win-x64' | 'linux-x64'} */ (target)
+ }
+ 
+ /**
+  * Return the mutable preparation and artifact directories owned by one release target.
+- * @param {'mac-arm64' | 'mac-x64' | 'win-x64'} target - Supported Desktop target name.
++ * @param {'mac-arm64' | 'mac-x64' | 'win-x64' | 'linux-x64'} target - Supported Desktop target name.
+  * @returns {{ root: string, artifacts: string, runtime: string, packageSet: string, seed: string, seedPnpm: string, nodeExtract: string, packedDsh: string, packedVendor: string, packedLandlock: string, downloads: string }} Target paths plus the shared immutable download cache.
+  */
+ export function desktopTargetBuildPaths(target) {
+diff --git a/apps/desktop/scripts/desktop-upload-plan.ts b/apps/desktop/scripts/desktop-upload-plan.ts
+index ff8a2f4868..4d2a806f71 100644
+--- a/apps/desktop/scripts/desktop-upload-plan.ts
++++ b/apps/desktop/scripts/desktop-upload-plan.ts
+@@ -19,6 +19,7 @@ const TARGETS = {
+   'mac-arm64': { platform: 'darwin', arch: 'arm64', os: 'mac' },
+   'mac-x64': { platform: 'darwin', arch: 'x64', os: 'mac' },
+   'win-x64': { platform: 'win32', arch: 'x64', os: 'win' },
++  'linux-x64': { platform: 'linux', arch: 'x64', os: 'linux' },
+ } as const satisfies Record<DesktopPackageTargetName, {
+   readonly platform: NodeJS.Platform
+   readonly arch: string
+diff --git a/apps/desktop/scripts/package-target.ts b/apps/desktop/scripts/package-target.ts
+index 1f32123ec0..1b691ef23f 100644
+--- a/apps/desktop/scripts/package-target.ts
++++ b/apps/desktop/scripts/package-target.ts
+@@ -27,14 +27,14 @@ const DESKTOP_UPLOAD_CREDENTIAL_ENV_NAMES = new Set([
+ ])
+ 
+ /** Fixed platform and architecture identifiers exposed by package scripts. */
+-export type DesktopPackageTargetName = 'mac-arm64' | 'mac-x64' | 'win-x64'
++export type DesktopPackageTargetName = 'mac-arm64' | 'mac-x64' | 'win-x64' | 'linux-x64'
+ 
+ /** One supported release target and its electron-builder selectors. */
+ export interface DesktopPackageTarget {
+   readonly name: DesktopPackageTargetName
+-  readonly platform: 'darwin' | 'win32'
++  readonly platform: 'darwin' | 'win32' | 'linux'
+   readonly arch: 'arm64' | 'x64'
+-  readonly builderPlatform: '--mac' | '--win'
++  readonly builderPlatform: '--mac' | '--win' | '--linux'
+   readonly builderArch: '--arm64' | '--x64'
+ }
+ 
+@@ -60,6 +60,13 @@ const TARGETS: Record<DesktopPackageTargetName, DesktopPackageTarget> = {
+     builderPlatform: '--win',
+     builderArch: '--x64',
+   },
++  'linux-x64': {
++    name: 'linux-x64',
++    platform: 'linux',
++    arch: 'x64',
++    builderPlatform: '--linux',
++    builderArch: '--x64',
++  },
+ }
+ 
+ /**
+@@ -139,6 +146,9 @@ export function resolveDesktopPackageTarget(
+   if (target.platform === 'darwin' && hostPlatform !== 'darwin') {
+     throw new Error(`desktop package: ${name} requires a macOS build host`)
+   }
++  if (target.platform === 'linux' && (hostPlatform !== 'linux' || hostArch !== 'x64')) {
++    throw new Error(`desktop package: ${name} requires a Linux x64 build host`)
++  }
+   if (name === 'mac-arm64' && hostArch !== 'arm64') {
+     throw new Error('desktop package: mac-arm64 requires an Apple Silicon build host')
+   }

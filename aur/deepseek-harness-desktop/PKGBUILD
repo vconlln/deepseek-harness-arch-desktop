@@ -1,0 +1,36 @@
+# Maintainer: vconlln <vconlln@users.noreply.github.com>
+#
+# deepseek-harness-desktop: 由上游第一方 apps/desktop 构建的 Arch 二进制包。
+#
+# 与 legacy 的 deepseek-harness-desktop-bin 的区别:
+#   - 本包来自 upstream deepseek-harness 的 apps/desktop(Electron 壳 + 打包 seed),
+#     由本仓库 patches/desktop-linux-x64.patch 打开 linux-x64 目标后构建;
+#   - 旧包来自本仓库自有的 dsh-plugin-desktop(Cordis 插件式桌面壳)。
+#
+# 发布流程:
+#   1. corepack yarn dist:desktop-linux          # 产出 dist/deepseek-harness-<ver>-linux-x64.pacman
+#   2. 上传产物到 GitHub Release(tag v<上游版本>)
+#   3. 更新下方 _upstreamver 与 sha256sums
+
+_owner=vconlln
+_upstreamver=0.1.3-alpha.2
+
+pkgname=deepseek-harness-desktop
+pkgver=0.1.3_alpha.2
+pkgrel=1
+pkgdesc='DeepSeek Harness 桌面端(上游 apps/desktop 的 Arch Linux 构建)'
+arch=(x86_64)
+url='https://github.com/vconlln/deepseek-harness-arch-desktop'
+license=(MIT)
+depends=('gtk3' 'nss' 'alsa-lib' 'libxss')
+optdepends=(
+  'bubblewrap: 文件系统沙箱后端,未安装时自动回退 Landlock'
+)
+provides=("deepseek-harness-desktop=${pkgver}")
+conflicts=(deepseek-harness-desktop-bin)
+source=("deepseek-harness-${_upstreamver}-linux-x64.pacman::https://github.com/${_owner}/deepseek-harness-arch-desktop/releases/download/v${_upstreamver}/deepseek-harness-${_upstreamver}-linux-x64.pacman")
+sha256sums=('SKIP')
+
+package() {
+  bsdtar -xf "${srcdir}/deepseek-harness-${_upstreamver}-linux-x64.pacman" -C "${pkgdir}"
+}

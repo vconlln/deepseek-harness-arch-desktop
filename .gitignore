@@ -9,6 +9,9 @@ node_modules/
 *.tsbuildinfo
 .build/
 
+# Arch artifacts produced by scripts/build-desktop-linux.mjs
+dist/
+
 dsh-plugin-desktop/dist/
 dsh-plugin-desktop/lib/
 dsh-community-market/lib/
